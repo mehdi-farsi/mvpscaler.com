@@ -1,0 +1,15 @@
+<%= form_with model: lead, url: leads_path, data: { turbo: true }, class: "flex w-full max-w-xl gap-2" do |f| %>
+  <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
+  <%= f.hidden_field :source,    value: "landing" %>
+  <!-- Honeypot -->
+  <%= f.text_field :nickname, autocomplete: "off", tabindex: "-1",
+                   class: "hidden", placeholder: "Leave blank" %>
+
+  <%= f.email_field :email,
+                    required: true,
+                    placeholder: "Enter your email",
+                    class: "w-full rounded-lg bg-white/90 text-black px-4 py-3 outline-none focus:ring-4 focus:ring-yellow-400" %>
+
+  <%= f.submit "Get early access",
+               class: "rounded-lg bg-yellow-400 px-5 py-3 font-semibold text-black hover:bg-yellow-300 transition" %>
+<% end %>

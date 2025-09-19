@@ -1,0 +1,81 @@
+<section id="hero" class="relative isolate h-[100svh] w-full overflow-hidden" data-controller="hero">
+  <!-- FULL-BLEED BACKGROUND -->
+  <img src="<%= image_path('hero-bg.png') %>" alt="" width="2400" height="1400"
+       class="absolute inset-0 -z-20 h-full w-full object-cover">
+  <!-- Subtle white wash -->
+  <div class="absolute inset-0 -z-10 bg-white/20 mix-blend-multiply"></div>
+
+  <!-- FULL-WIDTH GRID (no max-width wrapper) -->
+  <div class="relative z-10 h-full">
+    <div class="grid grid-cols-1 md:[grid-template-columns:2fr_1fr] h-full">
+      <!-- LEFT: Copy (2/3) -->
+      <div class="flex flex-col justify-center px-6 md:pl-12 md:pr-8 py-12 md:py-0 text-center md:text-left">
+        <h1 class="mt-0 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
+          <span class="block">
+            Validate Your Idea
+            <span class="bg-gradient-to-r from-emerald-500 to-teal-600 text-transparent bg-clip-text">
+              Before You Waste Months
+            </span>
+          </span>
+        </h1>
+
+        <div class="mt-6 max-w-2xl text-gray-600 space-y-5">
+          <p class="text-lg sm:text-xl leading-relaxed">
+            MVPScaler helps you create a landing page, generate AI-powered copy, and collect emails
+            <span class="font-semibold text-emerald-600">fast</span>.
+          </p>
+
+          <p class="text-base sm:text-lg leading-relaxed">
+            We also guide you on how to <span class="font-semibold text-emerald-600">promote your product efficiently</span>
+            to get initial traction: where to post, what to say, and how often during your launch window.
+          </p>
+
+          <div class="pt-2">
+            <div class="text-xs sm:text-sm uppercase tracking-wider text-gray-500 mb-2">After 10 days</div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-check-circle-fill"></i> 100+ signups = Success
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-rocket-takeoff"></i> 500+ signups = Banger
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 text-gray-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-hourglass-split"></i> &lt; 100 = Move on and save time
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Dark Form (1/3, edge-to-edge) -->
+      <div class="bg-gray-900 h-full w-full flex flex-col justify-center px-6 md:px-10 py-12">
+        <!-- Logo -->
+        <div class="mb-8 flex justify-center md:justify-start">
+          <%= image_tag "logo-mvpscaler.svg", class: "h-20 mx-auto" %>
+        </div>
+
+
+        <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Get early access</h2>
+        <p class="text-gray-400 mb-6 text-center md:text-left">
+          Join the waitlist and we will notify you as your idea gains traction.
+        </p>
+
+        <%= form_with model: @lead, url: leads_path, data: { turbo: true },
+                      html: { class: "flex flex-col gap-3", "aria-label": "Join the waitlist" } do |f| %>
+          <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
+          <%= f.hidden_field :source, value: "hero" %>
+
+          <%= f.email_field :email, required: true, placeholder: "Enter your email",
+                            class: "rounded-lg bg-gray-800 text-white placeholder-gray-400 px-4 py-3 outline-none focus:ring-4 focus:ring-emerald-500 shadow-sm" %>
+
+          <%= f.submit "Start Validating",
+                       class: "rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3 font-semibold text-white shadow-md transition" %>
+        <% end %>
+
+        <p class="mt-4 text-sm text-gray-500 text-center md:text-left">
+          We respect your inbox. Unsubscribe anytime.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

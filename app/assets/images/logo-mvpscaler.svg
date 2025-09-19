@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="90" viewBox="0 0 340 90" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="340" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10B981"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+
+    <!-- Slim arrowhead marker (flush with end of curve) -->
+    <marker id="arrow-right" markerWidth="8" markerHeight="6" refX="6" refY="3"
+            orient="auto" markerUnits="strokeWidth">
+      <polygon points="0,0 8,3 0,6" fill="url(#grad)"/>
+    </marker>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(10,6)">
+    <polygon points="30,0 60,15 60,45 30,60 0,45 0,15"
+             stroke="url(#grad)" stroke-width="3" fill="none"/>
+    <path d="M20 38 L30 28 L40 38"
+          stroke="url(#grad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="30" y1="28" x2="30" y2="48"
+          stroke="url(#grad)" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="90" y="50" font-family="Inter, sans-serif"
+        font-size="38" font-weight="800" fill="url(#grad)">MVP</text>
+  <text x="175" y="50" font-family="Inter, sans-serif"
+        font-size="38" font-weight="600" fill="#E5E7EB" letter-spacing="-0.5">
+    Scaler
+  </text>
+
+  <!-- Curved underline (with auto-oriented arrowhead) -->
+  <path d="M175 62 C215 74, 250 74, 290 62"
+        stroke="url(#grad)" stroke-width="2.5" fill="none" stroke-linecap="round"
+        marker-end="url(#arrow-right)"/>
+</svg>
