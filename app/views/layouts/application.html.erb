@@ -1,27 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "MVPScaler: Validate Your Ideas in days, not months" %></title>
-    <title></title>
-    <meta name="description" content="Spin up a landing page, get AI help for copy, and collect emails, so you can validate in 7 days without wasting months.">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="MVPScaler — Validate Your Idea in 7 Days">
-    <meta property="og:description" content="Spin up a landing page, get AI help for copy, and collect emails, so you can validate in 7 days without wasting months.">
-    <meta property="og:image" content="<%= asset_url('mvpscaler_og.png') %>">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="MVPScaler — Validate Your Idea in 7 Days">
-    <meta name="twitter:description" content="Spin up a landing page, get AI help for copy, and collect emails, so you can validate in 7 days without wasting months.">
-    <meta name="twitter:image" content="<%= asset_url('mvpscaler_og.png') %>">
+    <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= render "shared/meta" %>
 
     <%= yield :head %>
 
@@ -40,14 +28,7 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-
-    <style>
-        /* Reset default margins to prevent phantom top margin */
-        html, body {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <%= render 'layout/json_ld' %>
   </head>
 
   <body>

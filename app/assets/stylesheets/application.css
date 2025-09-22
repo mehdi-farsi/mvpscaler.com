@@ -8,3 +8,9 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Reset default margins to prevent phantom top margin */
+html, body {
+    margin: 0;
+    padding: 0;
+}

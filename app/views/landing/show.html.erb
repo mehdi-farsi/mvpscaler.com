@@ -1,7 +1,7 @@
 <section id="hero" class="relative isolate min-h-[100svh] md:h-[100svh] w-full overflow-visible md:overflow-hidden">
   <!-- FULL-BLEED BACKGROUND -->
-  <img src="<%= image_path('hero-bg.png') %>" alt="" width="2400" height="1400"
-       class="absolute inset-0 -z-20 h-full w-full object-cover">
+  <img src="<%= image_path('hero-bg.png') %>" aria-hidden="true" alt="hero section background" width="2400" height="1400"
+       class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high" decoding="async">
   <!-- Subtle white wash -->
   <div class="absolute inset-0 -z-10 bg-white/20 mix-blend-multiply"></div>
 
@@ -59,7 +59,7 @@
 
         <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Get early access</h2>
         <p class="text-gray-400 mb-6 text-center md:text-left">
-          Join the waitlist and be among the first to try it out.
+          Join the waitlist and be the first to try it.
         </p>
 
         <%= turbo_frame_tag "cta_form" do %>
