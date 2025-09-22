@@ -1,7 +1,13 @@
 <section id="hero" class="relative isolate min-h-[100svh] md:h-[100svh] w-full overflow-visible md:overflow-hidden">
   <!-- FULL-BLEED BACKGROUND -->
-  <img src="<%= image_path('hero-bg.png') %>" aria-hidden="true" alt="hero section background" width="2400" height="1400"
-       class="absolute inset-0 -z-20 h-full w-full object-cover" fetchpriority="high" decoding="async">
+  <picture>
+    <source srcset="<%= image_path('hero-bg.avif') %>" type="image/avif">
+    <source srcset="<%= image_path('hero-bg.webp') %>" type="image/webp">
+    <img src="<%= image_path('hero-bg.png') %>" alt="" aria-hidden="true"
+         width="2400" height="1400" fetchpriority="high" decoding="async"
+         class="absolute inset-0 -z-20 h-full w-full object-cover">
+  </picture>
+
   <!-- Subtle white wash -->
   <div class="absolute inset-0 -z-10 bg-white/20 mix-blend-multiply"></div>
 
