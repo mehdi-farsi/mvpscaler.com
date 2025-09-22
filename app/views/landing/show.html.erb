@@ -63,21 +63,7 @@
         </p>
 
         <%= turbo_frame_tag "cta_form" do %>
-          <%= form_with model: @lead, url: leads_path, data: { turbo: true },
-                        html: { class: "flex flex-col gap-3", "aria-label": "Join the waitlist" } do |f| %>
-            <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
-            <%= f.hidden_field :source, value: "hero" %>
-
-            <%= f.email_field :email, required: true, placeholder: "Enter your email",
-                              class: "rounded-lg bg-gray-800 text-white placeholder-gray-400 px-4 py-3 outline-none focus:ring-4 focus:ring-emerald-500 shadow-sm" %>
-
-            <%= f.submit "Start Validating",
-                         class: "rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3 font-semibold text-white shadow-md transition" %>
-          <% end %>
-
-          <p class="mt-4 text-sm text-gray-500 text-center md:text-left">
-            We respect your inbox. Unsubscribe anytime.
-          </p>
+          <%= render partial: 'landing/form', locals: { landing: true } %>
         <% end %>
       </div>
     </div>

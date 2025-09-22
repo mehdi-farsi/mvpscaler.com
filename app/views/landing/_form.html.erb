@@ -1,15 +1,35 @@
-<%= form_with model: lead, url: leads_path, data: { turbo: true }, class: "flex w-full max-w-xl gap-2" do |f| %>
-  <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
-  <%= f.hidden_field :source,    value: "landing" %>
-  <!-- Honeypot -->
-  <%= f.text_field :nickname, autocomplete: "off", tabindex: "-1",
-                   class: "hidden", placeholder: "Leave blank" %>
+<%= turbo_frame_tag "cta_form" do %>v
+  <%= form_with model: @lead, url: leads_path, data: { turbo: true },
+                html: { class: "flex flex-col gap-3", "aria-label": "Join the waitlist" } do |f| %>
+    <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
+    <%= f.hidden_field :source, value: "hero" %>
 
-  <%= f.email_field :email,
-                    required: true,
-                    placeholder: "Enter your email",
-                    class: "w-full rounded-lg bg-white/90 text-black px-4 py-3 outline-none focus:ring-4 focus:ring-yellow-400" %>
+    <div>
+      <%= f.email_field :email,
+                        required: true,
+                        placeholder: "Enter your email",
+                        aria: {
+                          invalid: (@lead.errors[:email].any?).to_s,
+                          describedby: (@lead.errors[:email].any? ? "email-error" : nil)
+                        },
+                        class: [
+                          "w-full rounded-lg bg-gray-800 text-white placeholder-gray-400 px-4 py-3",
+                          "outline-none focus:ring-4 focus:ring-emerald-500 shadow-sm",
+                          (@lead.errors[:email].any? ? "border border-red-500" : nil)
+                        ].compact.join(" ") %>
 
-  <%= f.submit "Get early access",
-               class: "rounded-lg bg-yellow-400 px-5 py-3 font-semibold text-black hover:bg-yellow-300 transition" %>
+      <% if @lead.errors[:email].any? %>
+        <p id="email-error" class="mt-1 text-xs text-red-400">
+          <%= @lead.errors[:email].first %>
+        </p>
+      <% end %>
+    </div>
+
+    <%= f.submit "Start Validating",
+                 class: "rounded-lg bg-emerald-500 hover:bg-emerald-400 px-6 py-3 font-semibold text-white shadow-md transition" %>
+  <% end %>
+
+  <p class="mt-4 text-sm text-gray-500 text-center md:text-left">
+    We respect your inbox. Unsubscribe anytime.
+  </p>
 <% end %>
