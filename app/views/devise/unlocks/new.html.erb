@@ -1,16 +1,18 @@
-<h2>Resend unlock instructions</h2>
+<div class="max-w-md mx-auto py-10">
+  <h1 class="text-2xl font-semibold mb-6">Unlock your account</h1>
 
-<%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <%= form_with model: resource,
+                url: unlock_path(resource_name),
+                data: { turbo: true },
+                class: "space-y-2" do |f| %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+    <%= f.email_field_row :email, label: "Email", icon: "envelope",
+                          hint: "We’ll send unlock instructions if the account is locked." %>
+
+    <%= f.submit_primary "Send unlock instructions" %>
+  <% end %>
+
+  <div class="mt-6 text-center text-sm">
+    <%= link_to "Back to Sign in", new_session_path(resource_name), class: "text-emerald-700 hover:underline" %>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Resend unlock instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

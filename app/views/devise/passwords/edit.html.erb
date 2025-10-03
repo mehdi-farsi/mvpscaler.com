@@ -1,25 +1,21 @@
-<h2>Change your password</h2>
+<div class="max-w-md mx-auto py-10">
+  <h1 class="text-2xl font-semibold mb-6">Choose a new password</h1>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
+  <%= form_with model: resource,
+                url: password_path(resource_name),
+                method: :put,
+                data: { turbo: true },
+                class: "space-y-2" do |f| %>
 
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
-    <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+    <%= f.hidden_field :reset_password_token %>
+
+    <%= f.password_field_row :password, label: "New password", icon: "lock", reveal: true, autocomplete: "new-password" %>
+    <%= f.password_field_row :password_confirmation, label: "Confirm new password", icon: "shield-lock", reveal: true, autocomplete: "new-password" %>
+
+    <%= f.submit_primary "Update password" %>
+  <% end %>
+
+  <div class="mt-6 text-center text-sm">
+    <%= link_to "Back to Sign in", new_session_path(resource_name), class: "text-emerald-700 hover:underline" %>
   </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

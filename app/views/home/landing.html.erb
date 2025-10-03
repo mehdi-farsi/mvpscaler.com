@@ -1,4 +1,96 @@
-<div>
-  <h1 class="font-bold text-4xl">Home#landing</h1>
-  <p>Find me in app/views/home/landing.html.erb</p>
-</div>
+<section id="hero" class="relative isolate min-h-[100svh] md:h-[100svh] w-full overflow-visible md:overflow-hidden">
+  <!-- FULL-BLEED BACKGROUND -->
+  <picture>
+    <source srcset="<%= image_path('hero-bg.avif') %>" type="image/avif">
+    <source srcset="<%= image_path('hero-bg.webp') %>" type="image/webp">
+    <img src="<%= image_path('hero-bg.png') %>" alt="" aria-hidden="true"
+         width="2400" height="1400" fetchpriority="high" decoding="async"
+         class="absolute inset-0 -z-20 h-full w-full object-cover">
+  </picture>
+
+  <!-- Subtle white wash -->
+  <div class="absolute inset-0 -z-10 bg-white/20 mix-blend-multiply"></div>
+
+  <!-- FULL-WIDTH GRID -->
+  <div class="relative z-10 h-auto md:h-full">
+    <div class="grid grid-cols-1 md:[grid-template-columns:2fr_1fr] h-auto md:h-full">
+
+      <!-- LEFT: Copy (2/3) -->
+      <div class="flex flex-col justify-center px-6 md:pl-12 md:pr-8 py-12 md:py-0 text-center md:text-left">
+        <h1 class="mt-0 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
+          <span class="block">
+            Validate Your Idea
+            <span
+              class="inline-block text-emerald-600
+                     sm:bg-gradient-to-r sm:from-emerald-500 sm:to-teal-600
+                     sm:bg-clip-text sm:text-transparent
+                     sm:[background-clip:text] sm:[-webkit-background-clip:text] sm:[-webkit-text-fill-color:transparent]">
+              Before You Waste Months
+            </span>
+          </span>
+        </h1>
+
+        <div class="mt-6 max-w-2xl text-gray-600 space-y-5">
+          <p class="text-lg sm:text-xl leading-relaxed">
+            MVPScaler helps you create a <span class="font-semibold text-emerald-600">landing page</span>, generate <span class="font-semibold text-emerald-600">AI-powered</span> copy, and collect emails
+            <span class="font-semibold text-emerald-600">fast</span> before you even start building your product.
+          </p>
+
+          <p class="text-base sm:text-lg leading-relaxed">
+            We also guide you on how to <span class="font-semibold text-emerald-600">promote your product efficiently</span>
+            to get initial traction: where to post, what to say, and how often during your launch window.
+          </p>
+
+          <div class="pt-2">
+            <div class="text-left text-xs sm:text-sm uppercase tracking-wider text-gray-500 mb-2">
+              After 10 days
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-check-circle-fill"></i> 100+ signups = Success
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-rocket-takeoff"></i> 500+ signups = Banger
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 text-gray-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-hourglass-split"></i> &lt; 100 = Move on and save time
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Dark Form (1/3, edge-to-edge) -->
+      <div class="bg-gray-900 w-full h-auto md:h-full flex flex-col justify-center px-6 md:px-10 py-12 relative">
+        <!-- Logo -->
+        <div class="mb-8 flex justify-center md:justify-start" data-hero-target="hero">
+          <%= image_tag "logo-mvpscaler.svg", class: "h-20 mx-auto" %>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Start in minutes</h2>
+        <p class="text-gray-400 mb-6 text-center md:text-left">
+          Sign in or create an account to try MVPScaler.
+        </p>
+
+
+        <div class="flex flex-col gap-3">
+          <%= link_to(new_user_session_path, class: "inline-flex items-center justify-center gap-2 rounded-lg bg-gray-100 text-gray-900 px-4 py-3 font-medium shadow-sm hover:bg-gray-200 transition") do %>
+            <i class="bi bi-box-arrow-in-right"></i>
+            Sign in
+          <% end %>
+
+          <%= link_to(new_user_registration_path, class: "inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 text-white px-4 py-3 font-semibold shadow-md hover:bg-emerald-500 transition") do %>
+            <i class="bi bi-rocket-takeoff"></i>
+            Try MVPScaler
+          <% end %>
+        </div>
+
+        <!-- Watermark -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0 text-xs text-gray-500 opacity-70 flex items-center gap-1">
+          Made with MVPScaler
+          <i class="bi bi-heart-fill text-emerald-500"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

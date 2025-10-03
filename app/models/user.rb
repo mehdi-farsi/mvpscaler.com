@@ -7,7 +7,7 @@ class User < ApplicationRecord
          :validatable,
          :omniauthable, omniauth_providers: [:google_oauth2]
 
-  enum plan: { free: 0, pro: 1 }
+  enum :plan, { free: 0, pro: 1 }
 
   def self.from_google(auth)
     user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)

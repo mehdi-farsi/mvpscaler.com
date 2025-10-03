@@ -13,11 +13,12 @@
   <div class="my-6 text-center text-sm text-gray-500">or</div>
 
   <div class="text-center">
-    <%= button_to "Continue with Google",
-                  user_google_oauth2_omniauth_authorize_path,
+    <%= button_to user_google_oauth2_omniauth_authorize_path,
                   method: :post,
+                  data: { turbo: false },
                   class: "inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50" do %>
-      <i class="bi bi-google"></i> Continue with Google
+      <i class="bi bi-google"></i>
+      <span>Continue with Google</span>
     <% end %>
   </div>
 

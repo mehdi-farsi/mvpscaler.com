@@ -4,7 +4,8 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_google(auth)
 
     if @user.persisted?
-      sign_in_and_redirect @user, event: :authentication
+      sign_in(@user) # do the login
+      redirect_to dashboard_path
     else
       redirect_to new_user_session_path, alert: "Google authentication failed."
     end
