@@ -269,6 +269,20 @@ Devise.setup do |config|
   config.sign_out_via = :delete
 
   # ==> OmniAuth
+  google_id     = Rails.application.credentials.dig(:google, :client_id)
+  google_secret = Rails.application.credentials.dig(:google, :client_secret)
+
+  if google_id.present? && google_secret.present?
+    config.omniauth :google_oauth2, google_id, google_secret,
+                    scope: "email,profile",
+                    prompt: "select_account",
+                    image_aspect_ratio: "square",
+                    image_size: 128
+  else
+    Rails.logger.warn("[Devise] Missing Google OAuth credentials in rails credentials")
+  end
+
+  OmniAuth.config.allowed_request_methods = [:post, :get]
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
