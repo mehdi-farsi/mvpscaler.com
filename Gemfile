@@ -59,3 +59,7 @@ group :development do
 end
 
 gem "sitemap_generator", "~> 6.3"
+
+gem "devise"
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
