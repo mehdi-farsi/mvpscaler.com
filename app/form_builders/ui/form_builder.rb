@@ -79,29 +79,37 @@ module Ui
 
     private
 
+    # app/form_builders/ui/form_builder.rb
     def input_row(method, input_helper, *args, label: nil, hint: nil, icon: nil, reveal: false, **opts)
-      @template.content_tag(:div, class: "mb-4") do
-        label_el = label(method, label || method.to_s.humanize, class: "block text-sm font-medium text-gray-200 mb-1")
-        field_el = input_with_chrome(method, input_helper, *args, icon:, reveal:, **opts)
-        hint_el  = hint ? @template.content_tag(:p, hint, class: "mt-1 text-xs text-gray-400") : "".html_safe
-        error_el = error_text(method)
-        @template.safe_join([label_el, field_el, hint_el, error_el])
-      end
+      # Build each fragment as a SafeBuffer
+      label_el = label(
+        method,
+        label || method.to_s.humanize,
+        class: "block text-sm font-medium text-gray-200 mb-1"
+      )
+
+      field_el = input_with_chrome(method, input_helper, *args, icon: icon, reveal: reveal, **opts)
+
+      hint_el  = hint.present? ? @template.content_tag(:p, hint, class: "mt-1 text-xs text-gray-400") : nil
+      error_el = error_text(method)
+
+      # Join only present parts (keeps SafeBuffer)
+      inner = @template.safe_join([label_el, field_el, hint_el, error_el].compact)
+
+      # Wrap in container (returns SafeBuffer)
+      @template.content_tag(:div, inner, class: "mb-4")
     end
 
     def input_with_chrome(method, input_helper, *args, icon: nil, reveal: false, **opts)
       has_error = object.respond_to?(:errors) && object.errors[method].present?
 
       base_classes = %w[
-        block w-full rounded-lg border px-3 py-2 shadow-sm transition
-        focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500
-      ]
-
-      # Dark theme styles for the auth card
-      base_classes += %w[
-        bg-gray-800 text-white placeholder-gray-400 border-gray-700
-      ]
-      base_classes += %w[border-red-500 focus:ring-red-500/20 focus:border-red-500] if has_error
+    block w-full rounded-lg border px-3 py-2 shadow-sm transition
+    focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500
+    bg-gray-800 text-white placeholder-gray-400 border-gray-700
+  ]
+      base_classes << "pl-10 pr-3" if icon
+      base_classes << "border-red-500 focus:ring-red-500/20 focus:border-red-500" if has_error
 
       input_opts = {
         class: [opts.delete(:class), base_classes.join(" ")].compact.join(" "),
@@ -118,35 +126,23 @@ module Ui
           public_send(input_helper, method, **input_opts.merge(args[0] || {}))
         end
 
-      # If we render with an icon or reveal button, wrap in relative container
-      wrapper_classes = "relative flex items-stretch"
-
-      # Left icon
       left_icon = if icon
                     @template.content_tag(:span,
                                           @template.content_tag(:i, "", class: "bi bi-#{icon}"),
                                           class: "pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"
                     )
-                  else
-                    "".html_safe
                   end
 
-      # Adjust padding if icon
-      field = field.sub('px-3', 'pl-10 pr-3') if icon
-
-      # Right reveal button (password)
       right_btn = if reveal
                     @template.content_tag(:button, type: "button",
                                           class: "absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-200",
                                           data: { action: "reveal#toggle" }) do
                       @template.content_tag(:i, "", class: "bi bi-eye")
                     end
-                  else
-                    "".html_safe
                   end
 
-      @template.content_tag(:div, class: wrapper_classes, data: (reveal ? { controller: "reveal" } : {})) do
-        @template.safe_join([left_icon, field, right_btn])
+      @template.content_tag(:div, class: "relative flex items-stretch", data: (reveal ? { controller: "reveal" } : {})) do
+        @template.safe_join([left_icon, field, right_btn].compact)
       end
     end
 

@@ -50,17 +50,12 @@
     <div class="w-full max-w-md rounded-2xl bg-gray-900/95 px-6 py-8 shadow-2xl ring-1 ring-black/10">
       <!-- Brand -->
       <div class="mb-6 flex items-center justify-center gap-2 text-gray-200">
-        <%= image_tag "logo-mvpscaler.svg", class: "h-10" %>
+        <%= image_tag "logo-mvpscaler.svg", class: "h-14" %> <!-- was h-10 -->
         <span class="sr-only">MVPScaler</span>
       </div>
 
       <%= render("shared/flash") if lookup_context.exists?("shared/_flash") %>
       <%= yield %>
-
-      <!-- Footer watermark -->
-      <div class="mt-6 text-center text-xs text-gray-500">
-        Made with MVPScaler <i class="bi bi-heart-fill text-emerald-500"></i>
-      </div>
     </div>
   </div>
 </section>
