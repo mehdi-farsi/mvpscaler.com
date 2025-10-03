@@ -1,0 +1,27 @@
+<div class="max-w-md mx-auto py-10">
+  <h1 class="text-2xl font-semibold mb-6">Sign in</h1>
+
+  <%= form_with model: resource, url: session_path(resource_name), data: { turbo: true }, class: "space-y-2" do |f| %>
+    <%= f.email_field_row :email, label: "Email", icon: "envelope" %>
+    <%= f.password_field_row :password, label: "Password", icon: "lock", reveal: true %>
+    <div class="flex items-center justify-between">
+      <%= f.submit_primary "Sign in" %>
+      <%= link_to "Forgot password?", new_password_path(resource_name), class: "text-sm text-gray-600 hover:underline" %>
+    </div>
+  <% end %>
+
+  <div class="my-6 text-center text-sm text-gray-500">or</div>
+
+  <div class="text-center">
+    <%= button_to "Continue with Google",
+                  user_google_oauth2_omniauth_authorize_path,
+                  method: :post,
+                  class: "inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50" do %>
+      <i class="bi bi-google"></i> Continue with Google
+    <% end %>
+  </div>
+
+  <div class="mt-6 text-center text-sm">
+    <%= link_to "Create an account", new_registration_path(resource_name), class: "text-emerald-700 hover:underline" %>
+  </div>
+</div>
