@@ -1,32 +1,36 @@
-<div class="max-w-md mx-auto py-10">
-  <h1 class="text-2xl font-semibold mb-6">Create your account</h1>
+<div class="max-w-md mx-auto py-2">
+  <h1 class="text-3xl font-semibold text-white text-center">Create your account</h1>
+  <p class="mt-2 text-center text-sm text-gray-400">Start validating ideas in minutes</p>
 
-  <%= form_with model: resource,
-                url: registration_path(resource_name),
-                data: { turbo: true },
-                class: "space-y-2" do |f| %>
-
-    <%= f.text_field_row  :name,  label: "Full name", icon: "person", hint: "Used in your dashboard and public pages." %>
+  <%= form_with model: resource, url: registration_path(resource_name), data: { turbo: true }, class: "mt-6 space-y-3" do |f| %>
+    <%= f.text_field_row  :name,  label: "Full name", icon: "person", hint: "Shown in your dashboard and public pages." %>
     <%= f.email_field_row :email, label: "Email",      icon: "envelope" %>
     <%= f.password_field_row :password, label: "Password", icon: "lock", reveal: true, autocomplete: "new-password" %>
     <%= f.password_field_row :password_confirmation, label: "Confirm password", icon: "shield-lock", reveal: true, autocomplete: "new-password" %>
 
-    <%= f.submit_primary "Create account" %>
+    <div>
+      <%= f.submit "Create account",
+                   class: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/30" %>
+    </div>
   <% end %>
 
-  <div class="my-6 text-center text-sm text-gray-500">or</div>
+  <div class="my-6 flex items-center gap-3">
+    <div class="h-px flex-1 bg-gray-800"></div>
+    <span class="text-xs text-gray-500">or</span>
+    <div class="h-px flex-1 bg-gray-800"></div>
+  </div>
 
-  <div class="text-center">
-    <%= button_to user_google_oauth2_omniauth_authorize_path,
-                  method: :post,
-                  data: { turbo: false },
-                  class: "inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50" do %>
+  <div>
+    <%= link_to user_google_oauth2_omniauth_authorize_path,
+                data: { turbo: false },
+                class: "inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 font-medium text-gray-100 shadow-sm hover:bg-gray-700" do %>
       <i class="bi bi-google"></i>
       <span>Continue with Google</span>
     <% end %>
   </div>
 
   <div class="mt-6 text-center text-sm">
-    <%= link_to "Already have an account? Sign in", new_session_path(resource_name), class: "text-emerald-700 hover:underline" %>
+    <span class="text-gray-400">Already have an account?</span>
+    <%= link_to "Sign in", new_session_path(resource_name), class: "ml-1 text-emerald-400 hover:text-emerald-300 underline underline-offset-4" %>
   </div>
 </div>
