@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  root "home#landing"
+  root "landing#show"
+  # root "home#landing"
   get "/landing-template", to: "landing#show", as: "landing_template1"
 
   resources :leads, only: :create
