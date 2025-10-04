@@ -1,18 +1,17 @@
-<div class="max-w-md mx-auto py-10">
-  <h1 class="text-2xl font-semibold mb-6">Reset your password</h1>
+<div class="max-w-md mx-auto py-2">
+  <h1 class="text-3xl font-semibold text-white text-center">Reset your password</h1>
+  <p class="mt-2 text-center text-sm text-gray-400">We’ll email you a reset link</p>
 
-  <%= form_with model: resource,
-                url: password_path(resource_name),
-                data: { turbo: true },
-                class: "space-y-2" do |f| %>
+  <%= form_with model: resource, url: password_path(resource_name), data: { turbo: true }, class: "mt-6 space-y-3" do |f| %>
+    <%= f.email_field_row :email, label: "Email", icon: "envelope", hint: "If this email exists, we’ll send you a link." %>
 
-    <%= f.email_field_row :email, label: "Email", icon: "envelope",
-                          hint: "We’ll send you a reset link if this email is in our records." %>
-
-    <%= f.submit_primary "Send reset link" %>
+    <div>
+      <%= f.submit "Send reset link",
+                   class: "w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/30" %>
+    </div>
   <% end %>
 
   <div class="mt-6 text-center text-sm">
-    <%= link_to "Back to Sign in", new_session_path(resource_name), class: "text-emerald-700 hover:underline" %>
+    <%= link_to "Back to Sign in", new_session_path(resource_name), class: "text-emerald-400 hover:text-emerald-300 underline underline-offset-1" %>
   </div>
 </div>
