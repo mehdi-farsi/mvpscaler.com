@@ -64,3 +64,5 @@ gem "devise"
 gem "omniauth-google-oauth2"
 gem "omniauth-rails_csrf_protection"
 gem "devise-i18n"
+
+gem "ruby_llm", "~> 1.8"
