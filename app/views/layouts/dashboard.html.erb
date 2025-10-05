@@ -30,11 +30,8 @@
 </head>
 
 <body class="bg-[#fafafa] text-gray-900">
-<!-- Hover-to-expand dashboard sidebar (overlay) -->
-<%= render "dashboard/sidebar" %>
-
 <!-- Top bar -->
-<header class="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur h-14">
   <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <%= link_to root_path, class: "flex items-center gap-2" do %>
@@ -58,6 +55,10 @@
     </nav>
   </div>
 </header>
+
+<!-- Hover-to-expand dashboard sidebar (overlay) -->
+<%= render "dashboard/sidebar" %>
+
 
 <!-- Flash messages -->
 <div class="max-w-6xl mx-auto px-4 mt-4 space-y-2">

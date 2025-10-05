@@ -3,6 +3,7 @@ class BriefPromptBuilder
     @brief = brief
   end
 
+  # Keep your existing methods
   def system
     <<~SYS
       You are a senior product marketer and designer.
@@ -53,5 +54,16 @@ class BriefPromptBuilder
       - Keep badges unless clearly misfit.
       - Output must be strict JSON. No markdown. No commentary.
     USR
+  end
+
+  # New: single string for RubyLLM.chat(input: ...)
+  def combined
+    <<~PROMPT
+      [SYSTEM]
+      #{system.strip}
+
+      [USER]
+      #{user.strip}
+    PROMPT
   end
 end

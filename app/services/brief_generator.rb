@@ -14,20 +14,34 @@ class BriefGenerator
     end
 
     prompt = BriefPromptBuilder.new(@brief)
+
+    # RubyLLM.chat expects a single input string, not messages:
+    combined_input = <<~PROMPT
+      [SYSTEM]
+      #{prompt.system.to_s.strip}
+
+      [USER]
+      #{prompt.user.to_s.strip}
+    PROMPT
+
     response = RubyLLM.chat(
-      messages: [
-        { role: "system", content: prompt.system },
-        { role: "user",   content: prompt.user }
-      ]
+      model: (Rails.application.credentials.dig(:openai, :chat_model) || RubyLLM.config.default_chat_model),
+      input: combined_input
+    # extra: { temperature: 0.4, max_output_tokens: 900 } # optional vendor params if you use them
     )
 
-    raw_h = response.respond_to?(:to_h) ? response.to_h : { content: response.content }
-    raw_h[:model] ||= response.respond_to?(:model) ? response.model : RubyLLM.config.default_chat_model
-    raw_h[:usage] ||= response.respond_to?(:usage) ? response.usage : nil
+    # Normalize to a hash with content/model/usage like before
+    content_str = response.respond_to?(:to_s) ? response.to_s : response.to_json
+    raw_h = {
+      content: content_str,
+      model:   (response.respond_to?(:model) ? response.model : (RubyLLM.config.default_chat_model rescue nil)),
+      usage:   (response.respond_to?(:usage) ? response.usage : nil)
+    }
 
     json = extract_json(raw_h)
     persist(json, model: raw_h[:model], usage: raw_h[:usage], raw: raw_h)
     true
+
   rescue JSON::ParserError, ParseError
     if defined?(raw_h)
       @brief.update!(
