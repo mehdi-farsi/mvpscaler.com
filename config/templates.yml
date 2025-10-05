@@ -1,0 +1,101 @@
+default:
+  sober:
+    id: sober
+    name: Sober
+    partial: "landings/templates/sober"
+    layout: "landing"
+    description: "Clean hero with dark right card and form."
+    fields:
+      general.left_bg:
+        type: color
+        label: "Left background"
+        default:
+      general.right_bg:
+        type: color
+        label: "Right panel color"
+        default: "#111827"
+      general.background_image:
+        type: image_asset
+        label: "Background image (fallback)"
+        choices: ["hero-bg.png"]
+        default: "hero-bg.png"
+      general.background_image_avif:
+        type: image_asset
+        label: "Background image (AVIF)"
+        choices: ["hero-bg.avif"]
+        default: "hero-bg.avif"
+      general.background_image_webp:
+        type: image_asset
+        label: "Background image (WEBP)"
+        choices: ["hero-bg.webp"]
+        default: "hero-bg.webp"
+
+      copy.headline:
+        type: text
+        label: "Headline"
+        default: "Your Guided Idea Validation Assistant"
+      copy.subheadline:
+        type: longtext
+        label: "Subheadline"
+        rows: 3
+        default: "The safest way to validate your idea before you waste months"
+      copy.paragraph_1:
+        type: longtext
+        label: "Paragraph 1"
+        rows: 4
+        default: "MVPScaler helps you define your audience, generate AI-assisted copy, and launch a clean validation landing page in minutes, not weeks."
+      copy.paragraph_2:
+        type: longtext
+        label: "Paragraph 2"
+        rows: 4
+        default: "It guides you step by step, from describing your idea to sharing it with the world, while collecting real feedback and signups."
+      copy.badge_1:
+        type: text
+        label: "Badge 1"
+        default: "100+ signups = Build it"
+      copy.badge_2:
+        type: text
+        label: "Badge 2"
+        default: "500+ signups = Banger"
+      copy.badge_3:
+        type: text
+        label: "Badge 3"
+        default: "< 100 = Move on, save time"
+      copy.cta_title:
+        type: text
+        label: "CTA title"
+        default: "Get early access"
+      copy.cta_sub:
+        type: text
+        label: "CTA subtitle"
+        default: "Try MVPScaler and validate your next idea with confidence."
+
+      colors.accent:
+        type: color
+        label: "Accent"
+        default: "#059669"
+      colors.accent_alt:
+        type: color
+        label: "Accent alt"
+        default: "#0d9488"
+      colors.right_panel:
+        type: color
+        label: "Right card background"
+        default: "#111827"
+      colors.text_light:
+        type: color
+        label: "Light text"
+        default: "#ffffff"
+      colors.text_muted:
+        type: color
+        label: "Muted text"
+        default: "#9ca3af"
+
+      buttons.primary_bg:
+        type: color
+        label: "Primary button bg"
+        default: "#059669"
+      buttons.primary_text:
+        type: color
+        label: "Primary button text"
+        default: "#ffffff"
