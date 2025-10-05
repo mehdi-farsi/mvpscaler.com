@@ -15,27 +15,26 @@ class BriefGenerator
 
     prompt = BriefPromptBuilder.new(@brief)
 
-    # RubyLLM.chat expects a single input string, not messages:
-    combined_input = <<~PROMPT
-      [SYSTEM]
-      #{prompt.system.to_s.strip}
-
-      [USER]
-      #{prompt.user.to_s.strip}
-    PROMPT
-
-    response = RubyLLM.chat(
-      model: (Rails.application.credentials.dig(:openai, :chat_model) || RubyLLM.config.default_chat_model),
-      input: combined_input
-    # extra: { temperature: 0.4, max_output_tokens: 900 } # optional vendor params if you use them
+    # Per RubyLLM docs: create chat, set system instructions, then ask with the user content
+    chat = RubyLLM.chat(
+      model: (Rails.application.credentials.dig(:openai, :chat_model) || RubyLLM.config.default_model)
     )
+    chat.with_instructions(prompt.system.to_s.strip, replace: true)
 
-    # Normalize to a hash with content/model/usage like before
-    content_str = response.respond_to?(:to_s) ? response.to_s : response.to_json
+    # Optional: control creativity
+    # chat = chat.with_temperature(0.4)
+
+    response = chat.ask(prompt.user.to_s.strip)
+    # response is a RubyLLM::Message; normalize to your expected hash-ish structure
     raw_h = {
-      content: content_str,
-      model:   (response.respond_to?(:model) ? response.model : (RubyLLM.config.default_chat_model rescue nil)),
-      usage:   (response.respond_to?(:usage) ? response.usage : nil)
+      content:       response.content.to_s,
+      model:         (response.respond_to?(:model_id) ? response.model_id : nil),
+      usage:         {
+        input_tokens:  (response.respond_to?(:input_tokens)  ? response.input_tokens  : nil),
+        output_tokens: (response.respond_to?(:output_tokens) ? response.output_tokens : nil),
+        total_tokens:  (response.respond_to?(:input_tokens) && response.respond_to?(:output_tokens) ?
+                          (response.input_tokens.to_i + response.output_tokens.to_i) : nil)
+      }
     }
 
     json = extract_json(raw_h)
