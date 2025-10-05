@@ -7,6 +7,9 @@ class User < ApplicationRecord
          :validatable,
          :omniauthable, omniauth_providers: [:google_oauth2]
 
+  has_many :projects, dependent: :destroy
+  has_many :briefs, dependent: :destroy
+
   enum :plan, { free: 0, pro: 1 }
 
   def self.from_google(auth)
@@ -21,5 +24,14 @@ class User < ApplicationRecord
     user.plan ||= :free
     user.save!
     user
+  end
+
+  def free_locked_brief?(project)
+    free? && project.briefs.where.not(locked_at: nil).exists?
+  end
+
+  def can_create_project?
+    return true if pro?
+    projects.count < 1
   end
 end
