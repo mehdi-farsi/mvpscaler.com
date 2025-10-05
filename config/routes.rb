@@ -1,17 +1,16 @@
 Rails.application.routes.draw do
   root "home#landing"
 
-  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
+  devise_for :users, controllers: {
+    registrations: "users/registrations",
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
 
   authenticated :user do
     get "/dashboard", to: "dashboard#show", as: :dashboard
 
     resources :projects, param: :id, except: [:destroy] do
-      resources :briefs, only: [:new, :create, :show] do
-        post :generate, on: :member
-        post :reparse,  on: :member
-        post :apply,    on: :member
-      end
+      resources :briefs, only: [:new, :create, :show]
 
       resource :landing_settings, only: [:edit, :update]
       get "preview", to: "previews#show"

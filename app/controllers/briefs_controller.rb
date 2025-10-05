@@ -1,46 +1,36 @@
 class BriefsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_project
-  before_action :set_brief, only: [:show, :generate, :reparse, :apply]
-  layout "dashboard"
 
   def new
-    if current_user.free_locked_brief?(@project)
-      redirect_to project_path(@project), alert: "Your free brief is locked. Upgrade to create another."
-      return
-    end
-    @brief = @project.briefs.new
+    authorize_project!
+
+    @brief = @project.briefs.build(
+      audience:     "developers",
+      problem:      "Spending weeks building without validating demand",
+      product_idea: "An assistant that generates a landing, copy, and collects signups fast"
+    )
   end
 
   def create
-    @brief = @project.briefs.new(brief_params.merge(user: current_user))
+    authorize_project!
+
+    @brief = @project.briefs.build(brief_params)
+
     if @brief.save
-      redirect_to project_brief_path(@project, @brief), notice: "Brief saved. Generate your copy and theme."
+      # 1) generate copy/colors with your existing pipeline (fixed to RubyLLM chat API)
+      BriefGenerator.new(brief: @brief).call
+
+      # 2) hydrate the active landing’s settings from the brief
+      ApplyBriefToLanding.new(
+        landing: @project.active_landing || @project.landings.active.first || @project.landings.last,
+        brief:   @brief
+      ).call
+
+      redirect_to project_path(@project), notice: "Your landing is ready. Tweak the copy or share your public link."
     else
       render :new, status: :unprocessable_content
     end
-  end
-
-  def show; end
-
-  def generate
-    BriefGenerator.new(@brief).call
-    @brief.lock! if current_user.free?
-    redirect_to project_brief_path(@project, @brief), notice: "Copy and theme generated."
-  rescue BriefGenerator::ParseError
-    redirect_to project_brief_path(@project, @brief), alert: "The AI response could not be parsed. Try Reparse."
-  end
-
-  def reparse
-    BriefGenerator.new(@brief, use_cached: true).call
-    redirect_to project_brief_path(@project, @brief), notice: "Reparsed from stored response."
-  rescue BriefGenerator::ParseError
-    redirect_to project_brief_path(@project, @brief), alert: "Stored response could not be parsed."
-  end
-
-  def apply
-    LandingApplier.new(@project, @brief).call
-    redirect_to project_path(@project), notice: "Applied to your active landing."
   end
 
   private
@@ -49,8 +39,8 @@ class BriefsController < ApplicationController
     @project = current_user.projects.find_by!(slug: params[:project_id])
   end
 
-  def set_brief
-    @brief = @project.briefs.find(params[:id])
+  def authorize_project!
+    # add Pundit/own check if you use it
   end
 
   def brief_params

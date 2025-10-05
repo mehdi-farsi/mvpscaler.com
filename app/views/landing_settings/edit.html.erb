@@ -2,7 +2,7 @@
 <div class="max-w-5xl mx-auto py-8">
   <h1 class="text-2xl font-bold text-gray-900 mb-6">Template settings</h1>
 
-  <%= form_with model: @landing, url: landing_settings_path(@project), method: :put, class: "space-y-6" do |f| %>
+  <%= form_with model: @landing, url: project_landing_settings_path(@project), method: :put, class: "space-y-6" do |f| %>
     <% groups = settings_grouped_fields(tmpl) %>
     <% groups.each do |group, fields| %>
       <div class="rounded-xl bg-white shadow-sm border border-gray-200 p-5">

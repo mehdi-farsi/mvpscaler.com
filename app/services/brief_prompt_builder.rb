@@ -1,14 +1,14 @@
 class BriefPromptBuilder
-  def initialize(brief)
-    @brief = brief
+  def initialize(brief, template:)
+    @brief    = brief
+    @template = template # instance of LandingTemplate
   end
 
-  # Keep your existing methods
   def system
     <<~SYS
       You are a senior product marketer and designer.
-      Task: generate landing copy and a cohesive color theme.
-      Output must be valid JSON only.
+      Task: generate landing copy and a cohesive color theme for the specified template.
+      Output must be valid JSON only. No explanations or markdown.
     SYS
   end
 
@@ -18,30 +18,11 @@ class BriefPromptBuilder
       Problem: #{@brief.problem}
       Product idea: #{@brief.product_idea}
 
-      Produce JSON with:
-      {
-        "copy": {
-          "headline": "...",
-          "subheadline": "...",
-          "paragraph_1": "...",
-          "paragraph_2": "...",
-          "badge_1": "100+ signups = Build it",
-          "badge_2": "500+ signups = Banger",
-          "badge_3": "< 100 = Move on, save time",
-          "cta_title": "Get early access",
-          "cta_sub": "Try MVPScaler and validate your next idea with confidence."
-        },
-        "theme": {
-          "accent": "#059669",
-          "accent_alt": "#0d9488",
-          "right_panel": "#111827",
-          "text_light": "#ffffff",
-          "text_muted": "#9ca3af",
-          "buttons": { "primary_bg": "#059669", "primary_text": "#ffffff" },
-          "typography": { "heading": "Inter", "body": "Inter" },
-          "backgrounds": { "left": null, "right": "#111827" }
-        }
-      }
+      Produce JSON with ONLY these top-level keys (if present in the template): #{json_top_keys.join(", ")}.
+
+      Schema (only include keys that exist in this template):
+
+      #{schema_block}
 
       Constraints:
       - Colors must be valid hex (#RRGGBB).
@@ -52,18 +33,50 @@ class BriefPromptBuilder
         * Indie hackers: practical and results focused.
         * Founders: outcome driven and credible.
       - Keep badges unless clearly misfit.
-      - Output must be strict JSON. No markdown. No commentary.
+      - Strict JSON. No markdown. No commentary.
     USR
   end
 
-  # New: single string for RubyLLM.chat(input: ...)
-  def combined
-    <<~PROMPT
-      [SYSTEM]
-      #{system.strip}
+  private
 
-      [USER]
-      #{user.strip}
-    PROMPT
+  def json_top_keys
+    @template.supported_buckets
+  end
+
+  # Build a per-template JSON schema block from YAML fields:
+  def schema_block
+    buckets = []
+
+    if @template.groups["copy"].present?
+      keys = @template.groups["copy"]
+      buckets << %Q("copy": {\n#{keys.map { |k| %Q(  "#{k}": "string") }.join(",\n")}\n})
+    end
+
+    if @template.groups["colors"].present?
+      keys = @template.groups["colors"]
+      buckets << %Q("colors": {\n#{keys.map { |k| %Q(  "#{k}": "#RRGGBB") }.join(",\n")}\n})
+    end
+
+    if @template.groups["buttons"].present?
+      keys = @template.groups["buttons"]
+      buckets << %Q("buttons": {\n#{keys.map { |k| %Q(  "#{k}": "#{k =~ /text/ ? '#RRGGBB' : '#RRGGBB'}") }.join(",\n")}\n})
+    end
+
+    if @template.groups["general"].present?
+      # We only request general fields that make sense for copy/colors (skip assets)
+      # But we still show keys so LLM could give background colors, etc.
+      keys = @template.groups["general"]
+      buckets << %Q("general": {\n#{keys.map { |k| %Q(  "#{k}": "#{general_hint_for(k)}") }.join(",\n")}\n})
+    end
+
+    "{\n" + buckets.join(",\n") + "\n}"
+  end
+
+  def general_hint_for(key)
+    if key.include?("bg")
+      "#RRGGBB"
+    else
+      "string or null"
+    end
   end
 end

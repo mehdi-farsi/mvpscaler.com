@@ -1,27 +1,49 @@
-<div class="max-w-3xl mx-auto py-10 space-y-6">
-  <h1 class="text-2xl font-bold text-gray-900">Tell us about your idea</h1>
-  <p class="text-gray-600">We will generate the first version of your landing copy and theme.</p>
+<% content_for :title, "Describe your idea" %>
 
-  <%= form_with model: [@project, @brief], class: "space-y-5" do |f| %>
-    <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
-      <%= f.label :audience, "Who is this for?", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :audience, class: "block w-full rounded-lg border border-gray-300 px-3 py-2" %>
-      <p class="mt-1 text-xs text-gray-500">Examples: developers, indie hackers, product teams.</p>
-    </div>
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Describe your idea</h1>
+    <p class="text-sm text-gray-600 mt-1">
+      Tell us who it’s for, the problem you want to solve, and your product idea. We’ll generate the first version of your landing automatically.
+    </p>
+  </div>
 
-    <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
-      <%= f.label :problem, "What problem are you solving?", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_area :problem, rows: 4, class: "block w-full rounded-lg border border-gray-300 px-3 py-2" %>
-    </div>
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="p-6">
+      <%= form_with model: [@project, @brief], class: "space-y-6" do |f| %>
 
-    <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
-      <%= f.label :product_idea, "Your product idea", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_area :product_idea, rows: 4, class: "block w-full rounded-lg border border-gray-300 px-3 py-2" %>
-    </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Audience</label>
+          <%= f.select :audience,
+                       [["Developers","developers"], ["Indie hackers","indie_hackers"], ["Founders","founders"], ["Other","other"]],
+                       { include_blank: "Select an audience" },
+                       class: "block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300" %>
+          <p class="mt-1 text-xs text-gray-500">We adapt tone to your audience automatically.</p>
+        </div>
 
-    <div class="flex items-center gap-3">
-      <%= f.submit "Save brief", class: "rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-500" %>
-      <%= link_to "Cancel", project_path(@project), class: "rounded-lg border border-gray-300 px-5 py-2 text-gray-700 hover:bg-gray-50" %>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Problem</label>
+          <%= f.text_area :problem, rows: 3, placeholder: "What’s the pain this idea solves?",
+                          class: "block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300" %>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Product idea</label>
+          <%= f.text_area :product_idea, rows: 4, placeholder: "Describe your idea in a few lines.",
+                          class: "block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300" %>
+          <p class="mt-1 text-xs text-gray-500">Tip: keep it concrete. We’ll generate concise copy and colors.</p>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <%= link_to "Back to dashboard", project_path(@project), class: "text-sm text-gray-600 hover:underline" %>
+          <%= f.submit "Generate my landing",
+                       class: "inline-flex items-center gap-2 rounded-lg bg-emerald-600 text-white px-4 py-2 font-medium shadow-sm hover:bg-emerald-500 transition" %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
+  </div>
+
+  <div class="mt-4 text-xs text-gray-500">
+    We’ll prefill your landing with the result. You can tweak everything afterwards.
+  </div>
 </div>
