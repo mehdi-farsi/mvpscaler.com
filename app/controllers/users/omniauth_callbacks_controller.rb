@@ -5,7 +5,15 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     if @user.persisted?
       sign_in(@user) # do the login
-      redirect_to dashboard_path
+
+      begin
+        project = Onboarding::ProvisionAfterSignup.new(user: @user).call
+
+        redirect_to new_project_brief_path(project) # /projects/:slug/briefs/new
+      rescue => e
+        Rails.logger.error("[Onboarding] #{e.class}: #{e.message}")
+        redirect_to dashboard_path
+      end
     else
       redirect_to new_user_session_path, alert: "Google authentication failed."
     end

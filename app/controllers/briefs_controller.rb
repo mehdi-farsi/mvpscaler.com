@@ -2,6 +2,8 @@ class BriefsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_project
 
+  layout 'dashboard'
+
   def new
     authorize_project!
 
@@ -15,8 +17,9 @@ class BriefsController < ApplicationController
   def create
     authorize_project!
 
-    @brief = @project.briefs.build(brief_params)
+    @brief = @project.briefs.build(brief_params.merge!(user: current_user))
 
+    pp ?1*100, @brief.valid?, @brief.errors.full_messages
     if @brief.save
       # 1) generate copy/colors with your existing pipeline (fixed to RubyLLM chat API)
       BriefGenerator.new(brief: @brief).call

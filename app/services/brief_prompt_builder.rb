@@ -1,7 +1,7 @@
 class BriefPromptBuilder
-  def initialize(brief, template:)
+  def initialize(brief, template = "sober")
     @brief    = brief
-    @template = template # instance of LandingTemplate
+    @template = LandingTemplate.find(template) # instance of LandingTemplate
   end
 
   def system

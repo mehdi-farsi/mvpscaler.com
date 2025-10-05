@@ -46,35 +46,6 @@ class LandingTemplate
       result
     end
 
-    def groups
-      @groups ||= begin
-                    grouped = Hash.new { |h,k| h[k] = [] }
-                    fields.each_key do |full|
-                      parts = full.to_s.split(".")
-                      next unless parts.size >= 2
-                      group = parts.first       # "copy", "colors", "buttons", "general"
-                      key   = parts[1..].join(".") # support nested like general.background_image
-                      grouped[group] << key
-                    end
-                    grouped
-                  end
-    end
-
-    # Only the top-level buckets we support in prompts/mapping
-    def supported_buckets
-      groups.keys & %w[copy colors buttons general]
-    end
-
-    # Return a default settings hash shaped like the template (using your YAML defaults)
-    def default_settings
-      LandingTemplate.defaults_for(id)
-    end
-
-    # Whitelist: check a (bucket, key) pair is defined by this template
-    def supports?(bucket, key)
-      groups[bucket]&.include?(key)
-    end
-
     private
 
     def load_templates
@@ -101,5 +72,34 @@ class LandingTemplate
         h[key.to_s] = new(attrs)
       end
     end
+  end
+
+  def groups
+    @groups ||= begin
+                  grouped = Hash.new { |h,k| h[k] = [] }
+                  fields.each_key do |full|
+                    parts = full.to_s.split(".")
+                    next unless parts.size >= 2
+                    group = parts.first       # "copy", "colors", "buttons", "general"
+                    key   = parts[1..].join(".") # support nested like general.background_image
+                    grouped[group] << key
+                  end
+                  grouped
+                end
+  end
+
+  # Only the top-level buckets we support in prompts/mapping
+  def supported_buckets
+    groups.keys & %w[copy colors buttons general]
+  end
+
+  # Return a default settings hash shaped like the template (using your YAML defaults)
+  def default_settings
+    LandingTemplate.defaults_for(id)
+  end
+
+  # Whitelist: check a (bucket, key) pair is defined by this template
+  def supports?(bucket, key)
+    groups[bucket]&.include?(key)
   end
 end

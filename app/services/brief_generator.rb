@@ -1,7 +1,7 @@
 class BriefGenerator
   class ParseError < StandardError; end
 
-  def initialize(brief, use_cached: false)
+  def initialize(brief:, use_cached: false)
     @brief = brief
     @use_cached = use_cached
   end
