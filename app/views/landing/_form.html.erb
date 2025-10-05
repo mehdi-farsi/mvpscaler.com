@@ -1,7 +1,6 @@
 <%= turbo_frame_tag "cta_form" do %>
-  <%= form_with model: @lead, url: leads_path, data: { turbo: true },
+  <%= form_with model: @lead, url: project_leads_path(project_slug: @project.slug), data: { turbo: true },
                 html: { class: "flex flex-col gap-3", "aria-label": "Join the waitlist" } do |f| %>
-    <%= f.hidden_field :idea_slug, value: "mvpscaler" %>
     <%= f.hidden_field :source, value: "hero" %>
 
     <div>

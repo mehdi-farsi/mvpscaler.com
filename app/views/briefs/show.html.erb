@@ -1,0 +1,96 @@
+<div class="max-w-5xl mx-auto py-10 space-y-6">
+  <div class="flex items-start justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Your brief</h1>
+      <p class="text-gray-600">Audience: <span class="text-gray-800"><%= @brief.audience %></span></p>
+    </div>
+    <div class="flex gap-2">
+      <% if @brief.locked? && current_user.free? %>
+        <button class="rounded-lg border border-gray-300 px-4 py-2 text-gray-500" disabled>Locked on Free</button>
+      <% else %>
+        <%= button_to "Generate", generate_project_brief_path(@project, @brief), method: :post,
+                      class: "rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-500" %>
+      <% end %>
+      <% if @brief.raw_response.present? %>
+        <%= button_to "Reparse stored response", reparse_project_brief_path(@project, @brief), method: :post,
+                      class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @brief.outputs.present? && @brief.theme.present? %>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-type text-gray-500 me-2"></i> Copy</h2>
+        <dl class="space-y-3 text-gray-800">
+          <div><dt class="text-sm text-gray-500">Headline</dt><dd class="font-semibold"><%= @brief.outputs["headline"] %></dd></div>
+          <div><dt class="text-sm text-gray-500">Subheadline</dt><dd><%= @brief.outputs["subheadline"] %></dd></div>
+          <div><dt class="text-sm text-gray-500">Paragraph 1</dt><dd><%= @brief.outputs["paragraph_1"] %></dd></div>
+          <div><dt class="text-sm text-gray-500">Paragraph 2</dt><dd><%= @brief.outputs["paragraph_2"] %></dd></div>
+          <div class="text-sm text-gray-600">
+            Badges: <code><%= @brief.outputs["badge_1"] %></code>,
+            <code><%= @brief.outputs["badge_2"] %></code>,
+            <code><%= @brief.outputs["badge_3"] %></code>
+          </div>
+          <div class="text-sm text-gray-600">
+            CTA: <code><%= @brief.outputs["cta_title"] %></code> — <%= @brief.outputs["cta_sub"] %>
+          </div>
+        </dl>
+      </div>
+
+      <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+        <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-palette text-gray-500 me-2"></i> Theme</h2>
+        <% t = @brief.theme || {} %>
+        <% colors = {
+          "Accent" => t["accent"],
+          "Accent alt" => t["accent_alt"],
+          "Right panel" => t["right_panel"],
+          "Text light" => t["text_light"],
+          "Text muted" => t["text_muted"],
+          "Button bg" => t.dig("buttons","primary_bg"),
+          "Button text" => t.dig("buttons","primary_text"),
+        } %>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <% colors.each do |label, hex| %>
+            <div class="rounded-lg border border-gray-200 p-3">
+              <div class="h-10 rounded mb-2" style="background:<%= hex %>"></div>
+              <div class="text-xs text-gray-600"><%= label %></div>
+              <div class="text-xs text-gray-800 font-mono"><%= hex %></div>
+            </div>
+          <% end %>
+        </div>
+        <% if @brief.model_used.present? || @brief.usage.present? %>
+          <p class="mt-3 text-xs text-gray-500">
+            Model: <%= @brief.model_used %>
+            <% if @brief.usage.present? %>
+              • Usage: <%= @brief.usage.to_json %>
+            <% end %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <%= link_to "Preview desktop", project_preview_path(@project, device: :desktop),
+                  class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
+      <%= link_to "Preview mobile",  project_preview_path(@project, device: :mobile),
+                  class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
+      <%= button_to "Apply to landing", apply_project_brief_path(@project, @brief),
+                    method: :post,
+                    class: "rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-500" %>
+    </div>
+  <% else %>
+    <div class="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+      <p class="text-gray-700 mb-4">No copy or theme yet. Generate to continue.</p>
+      <%= button_to "Generate copy and theme", generate_project_brief_path(@project, @brief), method: :post,
+                    class: "rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-500" %>
+    </div>
+  <% end %>
+
+  <% if @brief.raw_response.present? %>
+    <details class="mt-6">
+      <summary class="cursor-pointer text-sm text-gray-500">View stored raw response</summary>
+      <pre class="mt-2 p-3 bg-gray-50 border border-gray-200 rounded text-xs overflow-auto"><%= JSON.pretty_generate(@brief.raw_response) %></pre>
+    </details>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<% tmpl = @landing.template %>
+<div class="max-w-5xl mx-auto py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Template settings</h1>
+
+  <%= form_with model: @landing, url: landing_settings_path(@project), method: :put, class: "space-y-6" do |f| %>
+    <% groups = settings_grouped_fields(tmpl) %>
+    <% groups.each do |group, fields| %>
+      <div class="rounded-xl bg-white shadow-sm border border-gray-200 p-5">
+        <h2 class="font-semibold text-gray-900 mb-4"><i class="bi bi-sliders text-gray-500 me-2"></i> <%= group.to_s.titleize %></h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <% fields.each do |path, meta| %>
+            <%= render_settings_field(@landing, path, meta) %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= f.submit "Save settings", class: "rounded-lg bg-emerald-600 text-white px-5 py-2 hover:bg-emerald-500" %>
+  <% end %>
+</div>

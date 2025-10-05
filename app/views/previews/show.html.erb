@@ -1,0 +1,20 @@
+<div class="max-w-6xl mx-auto py-8 space-y-4">
+  <h1 class="text-2xl font-bold text-gray-900">Preview</h1>
+  <div class="flex items-center gap-2">
+    <%= link_to "Desktop", project_preview_path(@project, device: :desktop),
+                class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if @device=='desktop'}" %>
+    <%= link_to "Mobile",  project_preview_path(@project, device: :mobile),
+                class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if @device=='mobile'}" %>
+    <%= link_to "Open public", landing_show_path(@project.slug), class: "text-emerald-700 hover:underline text-sm" %>
+  </div>
+
+  <div class="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+    <% if @device == "mobile" %>
+      <div class="mx-auto my-6 border border-gray-200 rounded-[2rem] p-3 w-[380px]">
+        <iframe src="<%= landing_show_path(@project.slug) %>" class="w-[344px] h-[600px] rounded-[1.5rem] overflow-hidden"></iframe>
+      </div>
+    <% else %>
+      <iframe src="<%= landing_show_path(@project.slug) %>" class="w-full h-[80vh]"></iframe>
+    <% end %>
+  </div>
+</div>

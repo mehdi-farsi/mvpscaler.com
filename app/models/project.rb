@@ -24,6 +24,7 @@ class Project < ApplicationRecord
   private
 
   def ensure_slug
+
     return if slug.present?
     base = name.to_s.parameterize
     candidate = base.presence || "project"

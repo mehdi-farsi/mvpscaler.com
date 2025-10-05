@@ -1,8 +1,7 @@
 class LeadsController < ApplicationController
   def create
-    @lead = Lead.new(lead_params)
-
-    pp ?1*100, @lead.valid?, @lead.errors.full_messages
+    @project = Project.find_by!(slug: params[:project_slug])
+    @lead = @project.leads.new(lead_params)
 
     if @lead.save
       respond_to do |format|

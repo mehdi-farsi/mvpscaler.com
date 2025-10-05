@@ -1,33 +1,24 @@
+# app/models/landing_template.rb
 class LandingTemplate
   include ActiveModel::Model
-  include ActiveModel::Attributes
 
-  attribute :id, :string
-  attribute :name, :string
-  attribute :partial, :string
-  attribute :layout, :string
-  attribute :description, :string
-  attribute :fields, :any, default: {}
+  attr_accessor :id, :name, :partial, :layout, :description, :fields
+
+  def initialize(attributes = {})
+    attrs = (attributes || {}).deep_symbolize_keys
+    super(
+      id:          attrs[:id],
+      name:        attrs[:name],
+      partial:     attrs[:partial],
+      layout:      attrs[:layout],
+      description: attrs[:description],
+      fields:      attrs[:fields] || {}
+    )
+  end
 
   class << self
     def all
-      @all ||= begin
-                 raw = Rails.application.config_for(:templates)
-                 env_block = raw.is_a?(Hash) && raw.key?(Rails.env) ? raw[Rails.env] : raw
-                 env_block.transform_values { |attrs| build(attrs) }
-               end
-    end
-
-    def build(attrs)
-      a = attrs.deep_symbolize_keys
-      new(
-        id: a[:id],
-        name: a[:name],
-        partial: a[:partial],
-        layout: a[:layout],
-        description: a[:description],
-        fields: a[:fields] || {}
-      )
+      @all ||= load_templates
     end
 
     def find(key)
@@ -36,9 +27,9 @@ class LandingTemplate
 
     def defaults_for(key)
       tmpl = find(key) or return {}
-      flat = tmpl.fields.each_with_object({}) do |(path, meta), h|
-        meta = meta || {}
-        h[path.to_s] = meta["default"] || meta[:default]
+      flat = (tmpl.fields || {}).each_with_object({}) do |(path, meta), h|
+        meta = (meta || {}).with_indifferent_access
+        h[path.to_s] = meta[:default]
       end
       unflatten(flat)
     end
@@ -53,6 +44,33 @@ class LandingTemplate
         node[last] = value
       end
       result
+    end
+
+    private
+
+    def load_templates
+      path = Rails.root.join("config", "templates.yml")
+      data = if File.exist?(path)
+               YAML.safe_load(File.read(path), aliases: true) || {}
+             else
+               {}
+             end
+
+      # Priority: default: … → Rails.env → flat map
+      source =
+        if data.key?("default")
+          data["default"]
+        elsif data.key?(Rails.env)
+          data[Rails.env]
+        else
+          data
+        end
+
+      (source || {}).each_with_object({}) do |(key, attrs), h|
+        attrs ||= {}
+        attrs = attrs.merge("id" => (attrs["id"].presence || key.to_s))
+        h[key.to_s] = new(attrs)
+      end
     end
   end
 end

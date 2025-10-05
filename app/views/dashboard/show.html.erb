@@ -1,4 +1,16 @@
-<div>
-  <h1 class="font-bold text-4xl">Dashboard#show</h1>
-  <p>Find me in app/views/dashboard/show.html.erb</p>
-</div>
+<% if @projects.empty? %>
+  <div class="max-w-2xl mx-auto text-center py-20">
+    <h1 class="text-2xl font-bold text-gray-900">Start your first idea</h1>
+    <p class="mt-2 text-gray-600">We will help you turn a short brief into clear copy and a matching theme.</p>
+    <%= link_to "Create a project", new_project_path, class: "mt-6 inline-flex items-center gap-2 rounded-lg bg-emerald-600 text-white px-4 py-2 font-medium hover:bg-emerald-500" %>
+  </div>
+<% else %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <% @projects.each do |p| %>
+      <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
+        <h2 class="text-lg font-semibold text-gray-900"><%= link_to p.name, project_path(p) %></h2>
+        <p class="text-sm text-gray-500">Public: <%= link_to p.public_url, p.public_url, class: "text-emerald-700 hover:underline" %></p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

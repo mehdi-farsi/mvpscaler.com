@@ -1,0 +1,73 @@
+<% s = @landing %>
+<section id="hero" class="relative isolate min-h-[100svh] md:h-[100svh] w-full overflow-visible md:overflow-hidden">
+  <picture>
+    <% if s.s("general.background_image_avif").present? %>
+      <source srcset="<%= image_path(s.s("general.background_image_avif")) %>" type="image/avif">
+    <% end %>
+    <% if s.s("general.background_image_webp").present? %>
+      <source srcset="<%= image_path(s.s("general.background_image_webp")) %>" type="image/webp">
+    <% end %>
+    <img src="<%= image_path(s.s("general.background_image", "hero-bg.png")) %>" alt="" aria-hidden="true"
+         width="2400" height="1400" fetchpriority="high" decoding="async"
+         class="absolute inset-0 -z-20 h-full w-full object-cover">
+  </picture>
+
+  <div class="absolute inset-0 -z-10 bg-white/20 mix-blend-multiply"></div>
+
+  <div class="relative z-10 h-auto md:h-full">
+    <div class="grid grid-cols-1 md:[grid-template-columns:2fr_1fr] h-auto md:h-full">
+
+      <div class="flex flex-col justify-center px-6 md:pl-12 md:pr-8 py-12 md:py-0 text-center md:text-left" style="<%= s.s("general.left_bg") ? "background: #{s.s("general.left_bg")}" : "" %>">
+        <h1 class="mt-0 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
+          <span class="block"><%= s.s("copy.headline", "Your Guided Idea Validation Assistant") %></span>
+          <span class="mt-3 block text-xl sm:text-2xl font-medium leading-snug text-gray-800 tracking-tight">
+            The safest way to validate your idea <span class="text-emerald-600 font-semibold">before you waste months</span>
+          </span>
+        </h1>
+
+        <div class="mt-6 max-w-2xl text-gray-600 space-y-5">
+          <p class="text-lg sm:text-xl leading-relaxed"><%= s.s("copy.paragraph_1") %></p>
+          <p class="text-base sm:text-lg leading-relaxed"><%= s.s("copy.paragraph_2") %></p>
+
+          <div class="pt-2">
+            <div class="text-left text-xs sm:text-sm uppercase tracking-wider text-gray-500 mb-2">Your validation framework</div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-check-circle-fill"></i> <%= s.s("copy.badge_1", "100+ signups = Build it") %>
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-rocket-takeoff"></i> <%= s.s("copy.badge_2", "500+ signups = Banger") %>
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 text-gray-800 px-3 py-1 text-sm font-medium">
+                <i class="bi bi-hourglass-split"></i> <%= s.s("copy.badge_3", "< 100 = Move on, save time") %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full h-auto md:h-full flex flex-col justify-center px-6 md:px-10 py-12 relative"
+           style="background:<%= s.s('colors.right_panel', '#111827') %>">
+        <div class="mb-8 flex justify-center md:justify-start">
+          <% if @project.logo.attached? %>
+            <%= image_tag @project.logo.variant(resize_to_limit: [160, 160]), class: "h-20 mx-auto" %>
+          <% else %>
+            <%= image_tag "logo-mvpscaler.svg", class: "h-24 mx-auto" %>
+          <% end %>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left"><%= s.s("copy.cta_title", "Get early access") %></h2>
+        <p class="text-gray-400 mb-6 text-center md:text-left"><%= s.s("copy.cta_sub", "Try MVPScaler and validate your next idea with confidence.") %></p>
+
+        <%= turbo_frame_tag "cta_form" do %>
+          <%= render partial: "landing/form", locals: { project: @project } %>
+        <% end %>
+
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0 text-xs text-gray-500 opacity-70 flex items-center gap-1">
+          Made with MVPScaler
+          <i class="bi bi-heart-fill text-emerald-500"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
