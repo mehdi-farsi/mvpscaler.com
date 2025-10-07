@@ -1,3 +1,4 @@
+# config/templates.yml
 default:
   sober:
     id: sober
@@ -5,6 +6,37 @@ default:
     partial: "landings/templates/sober"
     layout: "landing"
     description: "Clean hero with dark right card and form."
+
+    # NEW: explicit UI sections for the editor
+    ui_sections:
+      - key: hero
+        title: "Hero"
+        fields:
+          - copy.headline
+          - copy.subheadline
+          - copy.paragraph_1
+          - copy.paragraph_2
+          - copy.badge_1
+          - copy.badge_2
+          - copy.badge_3
+          - general.left_bg
+          - general.background_image
+          - general.background_image_avif
+          - general.background_image_webp
+
+      - key: cta_card
+        title: "CTA card"
+        fields:
+          - copy.cta_title
+          - copy.cta_sub
+          - colors.right_panel
+          - colors.accent
+          - colors.accent_alt
+          - colors.text_light
+          - colors.text_muted
+          - buttons.primary_bg
+          - buttons.primary_text
+
     fields:
       general.left_bg:
         type: color
@@ -43,12 +75,10 @@ default:
         type: longtext
         label: "Paragraph 1"
         rows: 4
-        default: "MVPScaler helps you define your audience, generate AI-assisted copy, and launch a clean validation landing page in minutes, not weeks."
       copy.paragraph_2:
         type: longtext
         label: "Paragraph 2"
         rows: 4
-        default: "It guides you step by step, from describing your idea to sharing it with the world, while collecting real feedback and signups."
       copy.badge_1:
         type: text
         label: "Badge 1"

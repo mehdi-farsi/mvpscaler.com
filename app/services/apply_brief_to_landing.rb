@@ -3,43 +3,52 @@ class ApplyBriefToLanding
     @landing  = landing
     @brief    = brief
     @template = LandingTemplate.find(@landing.template_key)
+    raise ArgumentError, "Unknown template #{@landing.template_key}" unless @template
   end
 
   def call
-    # 1) Start from FULL template defaults (includes blank/nil keys)
-    defaults = LandingTemplate.defaults_for(@landing.template_key).deep_dup
+    # 1) Start from full defaults so shape is complete
+    defaults = @template.default_settings.deep_dup
 
-    # 2) Layer existing landing settings (preserve prior edits)
+    # 2) Layer existing saved settings to preserve prior edits
     settings = defaults.deep_merge(@landing.settings.presence || {})
 
-    # 3) Extract AI data from brief
-    data = @brief.try(:ai_output_json).presence ||
-           {
-             "copy"    => @brief.outputs,
-             "colors"  => (@brief.theme || {}),
-             "buttons" => (@brief.theme || {})["buttons"],
-             "general" => (@brief.theme || {})["backgrounds"]
-           }
-    data = data.compact
+    # 3) Extract brief JSON (prefer raw JSON stored; fall back to legacy split fields)
+    data = @brief.try(:ai_output_json).presence || legacy_fallback_from_brief
 
-    # 4) Overlay AI data, but only where the template supports it
-    merge_bucket!(settings, data, "copy")
-    merge_bucket!(settings, data, "colors")
-    merge_bucket!(settings, data, "buttons")
-    merge_bucket!(settings, data, "general")
+    # 4) Overlay data onto settings, only for whitelisted keys in this template
+    @template.supported_buckets.each do |bucket|
+      merge_bucket!(settings, data, bucket)
+    end
 
-    # 5) Persist on the landing row
+    # 5) Persist
     @landing.update!(settings: settings)
   end
 
   private
 
+  def legacy_fallback_from_brief
+    theme   = @brief.theme || {}
+    buttons = theme["buttons"] || {}
+    general = theme["backgrounds"] || {}
+
+    {
+      "copy"    => @brief.outputs || {},
+      "colors"  => theme.slice("accent", "accent_alt", "right_panel", "text_light", "text_muted"),
+      "buttons" => buttons.slice("primary_bg", "primary_text"),
+      "general" => general
+    }.compact
+  end
+
   def merge_bucket!(settings, data, bucket)
     return unless data[bucket].is_a?(Hash)
     settings[bucket] ||= {}
+
     data[bucket].each do |k, v|
-      next if v.blank?
-      settings[bucket][k] = v if @template.supports?(bucket, k)
+      next if v.nil? || (v.respond_to?(:empty?) && v.empty?)
+      if @template.supports?(bucket, k.to_s)
+        settings[bucket][k.to_s] = v
+      end
     end
   end
 end

@@ -1,7 +1,8 @@
 class BriefPromptBuilder
-  def initialize(brief, template = "sober")
+  def initialize(brief, template_key = "sober")
     @brief    = brief
-    @template = LandingTemplate.find(template) # instance of LandingTemplate
+    @template = LandingTemplate.find(template_key)
+    raise ArgumentError, "Unknown template #{template_key}" unless @template
   end
 
   def system
@@ -43,40 +44,30 @@ class BriefPromptBuilder
     @template.supported_buckets
   end
 
-  # Build a per-template JSON schema block from YAML fields:
   def schema_block
-    buckets = []
-
-    if @template.groups["copy"].present?
-      keys = @template.groups["copy"]
-      buckets << %Q("copy": {\n#{keys.map { |k| %Q(  "#{k}": "string") }.join(",\n")}\n})
+    by_bucket = Hash.new { |h, k| h[k] = [] }
+    @template.fields.each do |full_key, meta|
+      bucket, name = full_key.split(".", 2)
+      next unless @template.supported_buckets.include?(bucket)
+      by_bucket[bucket] << %Q(  "#{name}": "#{type_hint_for(meta)}")
     end
 
-    if @template.groups["colors"].present?
-      keys = @template.groups["colors"]
-      buckets << %Q("colors": {\n#{keys.map { |k| %Q(  "#{k}": "#RRGGBB") }.join(",\n")}\n})
-    end
+    inner = @template.supported_buckets.map do |bucket|
+      next if by_bucket[bucket].empty?
+      %Q(") + bucket + %Q(": {\n#{by_bucket[bucket].join(",\n")}\n})
+    end.compact
 
-    if @template.groups["buttons"].present?
-      keys = @template.groups["buttons"]
-      buckets << %Q("buttons": {\n#{keys.map { |k| %Q(  "#{k}": "#{k =~ /text/ ? '#RRGGBB' : '#RRGGBB'}") }.join(",\n")}\n})
-    end
-
-    if @template.groups["general"].present?
-      # We only request general fields that make sense for copy/colors (skip assets)
-      # But we still show keys so LLM could give background colors, etc.
-      keys = @template.groups["general"]
-      buckets << %Q("general": {\n#{keys.map { |k| %Q(  "#{k}": "#{general_hint_for(k)}") }.join(",\n")}\n})
-    end
-
-    "{\n" + buckets.join(",\n") + "\n}"
+    "{\n" + inner.join(",\n") + "\n}"
   end
 
-  def general_hint_for(key)
-    if key.include?("bg")
-      "#RRGGBB"
-    else
-      "string or null"
+  def type_hint_for(meta)
+    case meta["type"].to_s
+    when "text", "longtext" then "string"
+    when "color"            then "#RRGGBB"
+    when "image_asset"      then "asset filename or null"
+    when "boolean"          then "true or false"
+    when "number", "int"    then "number"
+    else                         "string or null"
     end
   end
 end

@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resources :projects, param: :id, except: [:destroy] do
       resources :briefs, only: [:new, :create, :show]
 
-      resource :landing, only: [:edit, :update], controller: "landings"
+      resource :landing, only: [:edit, :update], controller: "landing"
 
       resource :landing_settings, only: [:edit, :update]
       get "preview", to: "previews#show"

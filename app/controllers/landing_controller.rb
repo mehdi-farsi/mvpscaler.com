@@ -51,7 +51,7 @@ class LandingController < ApplicationController
 
   # Dashboard helpers
   def set_project_for_dashboard
-    @project = current_user.projects.find_by!(slug: params[:project_slug] || params[:slug])
+    @project = current_user.projects.find_by!(slug: params[:project_id] || params[:slug])
   end
 
   def set_landing_for_dashboard
