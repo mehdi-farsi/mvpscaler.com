@@ -19,14 +19,22 @@ class BriefsController < ApplicationController
 
     @brief = @project.briefs.build(brief_params.merge!(user: current_user))
 
-    pp ?1*100, @brief.valid?, @brief.errors.full_messages
     if @brief.save
       # 1) generate copy/colors with your existing pipeline (fixed to RubyLLM chat API)
       BriefGenerator.new(brief: @brief).call
 
-      # 2) hydrate the active landing’s settings from the brief
+      landing = @project.active_landing || @project.landings.find_by(active: true)
+      unless landing
+        landing = @project.landings.create!(
+          name:         "#{@project.name} · Sober",
+          template_key: "sober",
+          active:       true,
+          settings:     LandingTemplate.defaults_for("sober")
+        )
+      end
+
       ApplyBriefToLanding.new(
-        landing: @project.active_landing || @project.landings.active.first || @project.landings.last,
+        landing: landing,
         brief:   @brief
       ).call
 

@@ -1,17 +1,63 @@
+<%# app/views/projects/show.html.erb %>
+<% device = params[:device].presence_in(%w[desktop mobile]) || "desktop" %>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
+    <!-- Overview + Inline Preview -->
     <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-graph-up-arrow text-gray-500 me-2"></i> Overview</h2>
-      <p class="text-sm text-gray-600">Public page: <%= link_to @project.public_url, @project.public_url, class: "text-emerald-700 hover:underline" %></p>
+      <h2 class="font-semibold text-gray-900 mb-3">
+        <i class="bi bi-graph-up-arrow text-gray-500 me-2"></i> Overview
+      </h2>
+
+      <p class="text-sm text-gray-600">
+        Public page:
+        <%= link_to @project.public_url, @project.public_url, class: "text-emerald-700 hover:underline" %>
+      </p>
+
+      <!-- Actions -->
       <div class="mt-4 flex flex-wrap gap-3">
-        <%= link_to "Preview desktop", project_preview_path(@project, device: :desktop), class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
-        <%= link_to "Preview mobile",  project_preview_path(@project, device: :mobile),  class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
-        <%= link_to "Template settings", edit_project_landing_settings_path(@project), class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
+        <%= link_to "Template settings",
+                    edit_project_landing_settings_path(@project),
+                    class: "rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50" %>
+
+        <!-- Preview device switch -->
+        <div class="inline-flex items-center gap-2 ml-auto">
+          <%= link_to "Desktop",
+                      project_path(@project, device: :desktop),
+                      class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if device=='desktop'}" %>
+          <%= link_to "Mobile",
+                      project_path(@project, device: :mobile),
+                      class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if device=='mobile'}" %>
+          <%= link_to "Open public",
+                      landing_show_path(@project.slug),
+                      class: "text-emerald-700 hover:underline text-sm",
+                      target: "_blank", rel: "noopener" %>
+        </div>
+      </div>
+
+      <!-- Inline Preview -->
+      <div class="mt-4 rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <% if device == "mobile" %>
+          <div class="mx-auto my-6 border border-gray-200 rounded-[2rem] p-3 w-[380px]">
+            <iframe
+              src="<%= landing_show_path(@project.slug) %>"
+              class="w-[344px] h-[600px] rounded-[1.5rem] overflow-hidden"
+            ></iframe>
+          </div>
+        <% else %>
+          <iframe
+            src="<%= landing_show_path(@project.slug) %>"
+            class="w-full h-[70vh]"
+          ></iframe>
+        <% end %>
       </div>
     </div>
 
+    <!-- Your idea -->
     <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-lightbulb text-gray-500 me-2"></i> Your idea</h2>
+      <h2 class="font-semibold text-gray-900 mb-3">
+        <i class="bi bi-lightbulb text-gray-500 me-2"></i> Your idea
+      </h2>
       <% if @project.briefs.any? %>
         <% @project.briefs.order(created_at: :desc).each do |b| %>
           <div class="border border-gray-200 rounded-lg p-4 mb-3">
@@ -24,10 +70,14 @@
     </div>
   </div>
 
+  <!-- Sidebar -->
   <div class="space-y-6">
     <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-gear text-gray-500 me-2"></i> Project</h2>
-      <%= link_to "Edit project", edit_project_path(@project), class: "text-emerald-700 hover:underline text-sm" %>
+      <h2 class="font-semibold text-gray-900 mb-3">
+        <i class="bi bi-gear text-gray-500 me-2"></i> Project
+      </h2>
+      <%= link_to "Edit project", edit_project_path(@project),
+                  class: "text-emerald-700 hover:underline text-sm" %>
     </div>
   </div>
 </div>

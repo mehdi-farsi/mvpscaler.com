@@ -25,13 +25,25 @@ class LandingTemplate
       all[key.to_s]
     end
 
-    def defaults_for(key)
-      tmpl = find(key) or return {}
-      flat = (tmpl.fields || {}).each_with_object({}) do |(path, meta), h|
-        meta = (meta || {}).with_indifferent_access
-        h[path.to_s] = meta[:default]
+    def defaults_for(template_key)
+      tpl = find(template_key)
+      raise ArgumentError, "Unknown template #{template_key}" unless tpl
+
+      root = {}
+
+      tpl.fields.each do |full_key, defn|
+        parts = full_key.to_s.split(".") # e.g. ["general","background_image_webp"]
+        raise ArgumentError, "Invalid field key: #{full_key}" if parts.size < 2
+
+        bucket = parts.shift            # "copy", "colors", "buttons", "general"
+        key_path = parts                # ["background_image_webp"] or nested segments
+        default_val = defn["default"]   # may be nil/blank — still keep the key!
+
+        root[bucket] ||= {}
+        assign_nested(root[bucket], key_path, default_val)
       end
-      unflatten(flat)
+
+      root
     end
 
     def unflatten(hash)
@@ -70,6 +82,16 @@ class LandingTemplate
         attrs ||= {}
         attrs = attrs.merge("id" => (attrs["id"].presence || key.to_s))
         h[key.to_s] = new(attrs)
+      end
+    end
+
+    def assign_nested(hash, keys, value)
+      k = keys.first
+      if keys.length == 1
+        hash[k] = value
+      else
+        hash[k] ||= {}
+        assign_nested(hash[k], keys[1..], value)
       end
     end
   end
