@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_05_075608) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_07_161806) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_05_075608) do
     t.datetime "updated_at", null: false
     t.index ["project_id"], name: "index_briefs_on_project_id"
     t.index ["user_id"], name: "index_briefs_on_user_id"
+  end
+
+  create_table "landing_assets", force: :cascade do |t|
+    t.bigint "landing_id", null: false
+    t.string "field_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["field_key"], name: "index_landing_assets_on_field_key"
+    t.index ["landing_id"], name: "index_landing_assets_on_landing_id"
   end
 
   create_table "landings", force: :cascade do |t|
@@ -117,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_05_075608) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "briefs", "projects"
   add_foreign_key "briefs", "users"
+  add_foreign_key "landing_assets", "landings"
   add_foreign_key "landings", "projects"
   add_foreign_key "projects", "users"
 end

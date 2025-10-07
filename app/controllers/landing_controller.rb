@@ -32,21 +32,28 @@ class LandingController < ApplicationController
     @template = LandingTemplate.find(@landing.template_key)
 
     incoming = params.fetch(:settings_flat, {}).permit!.to_h
-    filtered = whitelist_by_template(incoming, @template)
+    filtered = whitelist_by_template(incoming, @template) # you already added this
 
-    # Merge into existing settings
-    new_settings = @landing.settings.deep_merge(filtered)
+    # 1) Merge text/select changes
+    @landing.update!(settings: @landing.settings.deep_merge(filtered)) if filtered.present?
 
-    pp ?1*100, @landing.settings, ?1*100, filtered, ?1*100
-    @landing.update!(settings: new_settings)
+    # 2) Process uploads (optional per-field)
+    upload_params = params.fetch(:uploads, {}).permit!.to_h # { "general.background_image" => <ActionDispatch::Http::UploadedFile>, ... }
+
+    upload_params.each do |field_key, uploaded|
+      next unless uploaded.respond_to?(:original_filename)
+      # Find-or-create an asset row for that field
+      asset = @landing.landing_assets.find_or_initialize_by(field_key:)
+      asset.file.attach(uploaded)
+      asset.save!
+
+      # Optional: store a marker in settings to indicate “uploaded” present, or clear filename to avoid confusion
+      # e.g., keep both: the resolver prefers uploaded file anyway.
+    end
 
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("save_notice",
-                                                  partial: "landing/save_notice")
-      end
-      format.html { redirect_to edit_project_landing_path(@project),
-                                notice: "Settings updated." }
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("save_notice", partial: "landing/save_notice") }
+      format.html { redirect_to edit_project_landing_path(@project), notice: "Settings updated." }
     end
   end
 

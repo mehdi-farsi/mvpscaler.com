@@ -46,7 +46,6 @@
     </div>
 
   <% when "image_asset" %>
-    <%# Build a filename => URL map so previews work with fingerprinted assets %>
     <% url_map = choices.any? ? choices.index_with { |fn| image_path(fn) } : {} %>
 
     <div class="mb-4"
@@ -60,23 +59,18 @@
           <% initial_src =
                if current.blank?
                  ""
-               elsif current.to_s.start_with?("http", "/")
-                 current
-               elsif url_map[current.to_s]
-                 url_map[current.to_s]
                else
-                 image_path(current.to_s)
+                 # Prefer uploaded asset if present
+                 @landing.asset_url_for(field_key)
                end %>
-
-          <img
-            data-landing-editor-target="imagePreview"
-            src="<%= initial_src %>"
-            alt="<%= current.presence || 'no image' %>"
-            class="w-full h-full object-cover"
-            onerror="this.src=''; this.alt='no image';">
+          <img data-landing-editor-target="imagePreview"
+               src="<%= initial_src %>"
+               alt="<%= current.presence || 'no image' %>"
+               class="w-full h-full object-cover"
+               onerror="this.src=''; this.alt='no image';">
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 space-y-2">
           <% if choices.any? %>
             <select
               name="settings_flat[<%= field_key %>]"
@@ -89,7 +83,7 @@
                 <option value="<%= fn %>" <%= "selected" if current.to_s == fn %>><%= fn %></option>
               <% end %>
             </select>
-            <p class="mt-1 text-xs text-gray-500">Choose a bundled asset. Preview updates instantly.</p>
+            <p class="text-xs text-gray-500">Pick a bundled asset or upload your own.</p>
           <% else %>
             <input type="text"
                    name="settings_flat[<%= field_key %>]"
@@ -99,8 +93,22 @@
                    data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
                    class="block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm transition
                         focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300" />
-            <p class="mt-1 text-xs text-gray-500">Enter a filename shipped with the app or a full URL.</p>
           <% end %>
+
+          <div class="flex items-center gap-2">
+            <button type="button"
+                    data-action="landing-editor#pickFile"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-gray-50">
+              <i class="bi bi-upload"></i> Upload
+            </button>
+
+            <input type="file"
+                   accept="image/*"
+                   name="uploads[<%= field_key %>]"
+                   data-landing-editor-target="fileInput"
+                   data-action="change->landing-editor#fileChosen"
+                   class="hidden" />
+          </div>
         </div>
       </div>
     </div>

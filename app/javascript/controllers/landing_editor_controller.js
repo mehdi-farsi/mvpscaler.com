@@ -1,50 +1,39 @@
-// app/javascript/controllers/landing_editor_controller.js
 import { Controller } from "@hotwired/stimulus"
 
-// Controls image-asset inputs with a live preview.
-// Works with either a <select> of known assets or a free-text <input>.
-// Provide a JSON filename->URL map via data-url-map-value when you have fingerprinted assets.
 export default class extends Controller {
-    static targets = ["imageInput", "imagePreview"]
-    static values = {
-        urlMap: Object // { "hero-bg.webp": "/assets/hero-bg-xxxxx.webp", ... }
+    static targets = ["imageInput", "imagePreview", "fileInput"]
+    static values = { urlMap: Object }
+
+    updateImage(event) {
+        const val = (event.currentTarget.value || "").trim()
+        const url = this.resolveUrl(val)
+        if (!url) return
+        this.updatePreview(url, val)
     }
 
-    // Hook up to both `input` and `change` events
-    updateImage(event) {
-        const el = event.currentTarget
-        const val = (el.value || "").trim()
-        const url = this.resolveUrl(val)
+    pickFile() { this.fileInputTarget?.click() }
 
-        if (!url) return
+    fileChosen(event) {
+        const file = event.currentTarget.files?.[0]
+        if (!file) return
+        const url = URL.createObjectURL(file)
+        this.updatePreview(url, file.name)
+    }
 
-        // Find the preview that belongs to this input (same wrapper)
-        let preview = el.closest("[data-landing-editor-target-wrapper]")
-            ?.querySelector("[data-landing-editor-target='imagePreview']")
-
-        // Fallback: use first previewTarget
-        if (!preview && this.hasImagePreviewTarget) preview = this.imagePreviewTargets[0]
-
+    updatePreview(url, alt) {
+        // Scoped to the current field wrapper
+        const wrapper = this.element.closest("[data-landing-editor-field]") || this.element
+        const preview = wrapper.querySelector("[data-landing-editor-target='imagePreview']") || this.imagePreviewTarget
         if (preview) {
             preview.src = url
-            preview.alt = val || "image preview"
+            preview.alt = alt || "image preview"
         }
     }
 
-    resolveUrl(filenameOrUrl) {
-        if (!filenameOrUrl) return null
-
-        // If full URL or absolute path, use as-is
-        if (/^https?:\/\//i.test(filenameOrUrl) || filenameOrUrl.startsWith("/")) {
-            return filenameOrUrl
-        }
-
-        // If we have a urlMap (fingerprinted assets), prefer it
-        if (this.hasUrlMapValue && this.urlMapValue[filenameOrUrl]) {
-            return this.urlMapValue[filenameOrUrl]
-        }
-
-        // Heuristic fallback: try Rails /assets path (non-fingerprinted or dev)
-        return `/assets/${filenameOrUrl}`
+    resolveUrl(v) {
+        if (!v) return null
+        if (/^https?:\/\//i.test(v) || v.startsWith("/")) return v
+        if (this.hasUrlMapValue && this.urlMapValue[v]) return this.urlMapValue[v]
+        return `/assets/${v}`
     }
 }
