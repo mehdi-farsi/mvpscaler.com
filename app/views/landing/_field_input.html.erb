@@ -1,7 +1,7 @@
 <%# app/views/landing/_field_input.html.erb %>
 <%# locals: field_key (e.g. "copy.headline"), template:, landing: %>
 <%
-  meta      = template.fields[field_key] || {}
+  meta      = template.fields[field_key].stringify_keys || {}
   label     = meta["label"].presence || field_key.split(".").last.humanize
   type      = meta["type"].to_s
   rows      = (meta["rows"].presence || 3).to_i
@@ -11,10 +11,11 @@
   bucket, *rest = field_key.split(".")
   current = landing.settings.dig(bucket, *rest)
   current = LandingTemplate.defaults_for(landing.template_key).dig(bucket, *rest) if current.nil?
+  pp ?2*100, meta, label, type, rows, choices,  bucket, current
 %>
 
 <div class="mb-4">
-  <label class="block text-sm font-medium text-gray-700 mb-1"><%= label %></label>
+  <label class="block text-sm font-medium text-gray-700 mb-1"><%= label %> </label>
 
   <% case type %>
   <% when "text" %>
@@ -45,35 +46,62 @@
     </div>
 
   <% when "image_asset" %>
-    <%# Opinionated: pick from known asset choices, show a preview thumbnail %>
-    <div class="flex items-center gap-3">
-      <div class="w-24 h-16 rounded border border-gray-200 overflow-hidden bg-gray-50">
-        <% if current.present? %>
-          <img src="<%= image_path(current) %>" alt="" class="w-full h-full object-cover">
-        <% else %>
-          <div class="w-full h-full grid place-items-center text-xs text-gray-400">no image</div>
-        <% end %>
-      </div>
+    <%# Build a filename => URL map so previews work with fingerprinted assets %>
+    <% url_map = choices.any? ? choices.index_with { |fn| image_path(fn) } : {} %>
 
-      <div class="flex-1">
-        <% if choices.any? %>
-          <select name="settings_flat[<%= field_key %>]"
-                  class="block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 shadow-sm transition
-                         focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300">
-            <option value=""></option>
-            <% choices.each do |fn| %>
-              <option value="<%= fn %>" <%= "selected" if current.to_s == fn %>><%= fn %></option>
-            <% end %>
-          </select>
-        <% else %>
-          <input type="text"
-                 name="settings_flat[<%= field_key %>]"
-                 value="<%= current.to_s %>"
-                 placeholder="asset filename (e.g., hero-bg.webp)"
-                 class="block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm transition
+    <div class="mb-4"
+         data-controller="landing-editor"
+         data-landing-editor-url-map-value="<%= url_map.to_json %>"
+         data-landing-editor-field>
+      <label class="block text-sm font-medium text-gray-700 mb-1"><%= label %></label>
+
+      <div class="flex items-center gap-3">
+        <div class="w-28 h-18 rounded border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
+          <% initial_src =
+               if current.blank?
+                 ""
+               elsif current.to_s.start_with?("http", "/")
+                 current
+               elsif url_map[current.to_s]
+                 url_map[current.to_s]
+               else
+                 image_path(current.to_s)
+               end %>
+
+          <img
+            data-landing-editor-target="imagePreview"
+            src="<%= initial_src %>"
+            alt="<%= current.presence || 'no image' %>"
+            class="w-full h-full object-cover"
+            onerror="this.src=''; this.alt='no image';">
+        </div>
+
+        <div class="flex-1">
+          <% if choices.any? %>
+            <select
+              name="settings_flat[<%= field_key %>]"
+              data-landing-editor-target="imageInput"
+              data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
+              class="block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 shadow-sm transition
+                   focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300">
+              <option value=""></option>
+              <% choices.each do |fn| %>
+                <option value="<%= fn %>" <%= "selected" if current.to_s == fn %>><%= fn %></option>
+              <% end %>
+            </select>
+            <p class="mt-1 text-xs text-gray-500">Choose a bundled asset. Preview updates instantly.</p>
+          <% else %>
+            <input type="text"
+                   name="settings_flat[<%= field_key %>]"
+                   value="<%= current.to_s %>"
+                   placeholder="e.g., hero-bg.webp or https://…"
+                   data-landing-editor-target="imageInput"
+                   data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
+                   class="block w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm transition
                         focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 border-gray-300" />
-        <% end %>
-        <p class="mt-1 text-xs text-gray-500">Pick an asset shipped with the template.</p>
+            <p class="mt-1 text-xs text-gray-500">Enter a filename shipped with the app or a full URL.</p>
+          <% end %>
+        </div>
       </div>
     </div>
 
