@@ -5,15 +5,28 @@ export default class extends Controller {
     static values  = { duration: Number }
 
     connect() {
-        // Animate the bottom bar from 100% to 0%
+        const dur = this.durationValue || 4000
+
+        // Animate the countdown bar
         if (this.hasBarTarget) {
-            // force layout, then set transition + shrink
-            this.barTarget.style.width = "100%"
-            this.barTarget.style.transition = `width ${this.duration}ms linear`
-            requestAnimationFrame(() => { this.barTarget.style.width = "0%" })
+            const bar = this.barTarget
+
+            // Set initial state without transition
+            bar.style.transition = "none"
+            bar.style.width = "100%"
+
+            // Force layout, then enable transition and shrink
+            // (without this, some browsers won't animate width)
+            // eslint-disable-next-line no-unused-expressions
+            bar.offsetWidth
+            bar.style.transition = `width ${dur}ms linear`
+
+            requestAnimationFrame(() => {
+                bar.style.width = "0%"
+            })
         }
 
-        // Fade-in (optional)
+        // Fade-in
         this.element.classList.add("opacity-0", "translate-y-2")
         requestAnimationFrame(() => {
             this.element.classList.add("transition", "duration-200")
@@ -21,7 +34,7 @@ export default class extends Controller {
         })
 
         // Auto close
-        this.timeout = setTimeout(() => this.close(), this.duration || 4000)
+        this.timeout = setTimeout(() => this.close(), dur)
     }
 
     disconnect() {
@@ -29,9 +42,9 @@ export default class extends Controller {
     }
 
     close() {
-        // graceful fade-out then remove
-        this.element.classList.add("opacity-0", "translate-y-2")
-        this.element.classList.add("transition", "duration-200")
-        setTimeout(() => this.element.remove(), 220)
+        this.element.classList.add("opacity-0", "translate-y-2", "transition", "duration-200")
+        setTimeout(() => {
+            this.element.remove()
+        }, 220)
     }
 }
