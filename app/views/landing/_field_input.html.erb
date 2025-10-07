@@ -1,0 +1,40 @@
+<% meta   = template.fields[field_key] %>
+<% bucket, name = field_key.split(".", 2) %>
+<% label  = meta["label"] || name.humanize %>
+<% type   = meta["type"] %>
+<% rows   = meta["rows"] %>
+<% value  = landing.s("#{bucket}.#{name}", meta["default"]) %>
+
+<div class="mb-4">
+  <label class="block text-sm font-medium text-gray-700 mb-1"><%= label %></label>
+
+  <% if type == "text" %>
+    <%= text_field_tag "settings[#{bucket}][#{name}]", value,
+                       class: "block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500" %>
+
+  <% elsif type == "longtext" %>
+    <%= text_area_tag "settings[#{bucket}][#{name}]", value, rows: (rows || 3),
+                      class: "block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500" %>
+
+  <% elsif type == "color" %>
+    <%= color_field_tag "settings[#{bucket}][#{name}]", value,
+                        class: "h-10 w-24 rounded border border-gray-300" %>
+
+  <% elsif type == "image_asset" %>
+    <div>
+      <% choices = Array(meta["choices"]) %>
+      <%= select_tag "settings[#{bucket}][#{name}]",
+                     options_for_select(choices, value),
+                     include_blank: "(none)",
+                     class: "block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500" %>
+      <% if value.present? %>
+        <div class="mt-2">
+          <%= image_tag image_path(value), class: "h-16 rounded border" %>
+        </div>
+      <% end %>
+    </div>
+
+  <% else %>
+    <p class="text-xs text-gray-400">Unsupported field type: <%= type %></p>
+  <% end %>
+</div>

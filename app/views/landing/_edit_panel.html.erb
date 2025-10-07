@@ -1,0 +1,37 @@
+<div class="mt-4">
+  <div id="save_notice"></div>
+
+  <%= form_with url: project_landing_path(project), method: :patch,
+                data: { turbo_frame: "project_panel" },
+                class: "grid grid-cols-1 lg:grid-cols-2 gap-6" do %>
+
+    <!-- LEFT PANEL -->
+    <div class="rounded-xl bg-white border border-gray-200 p-6 shadow-sm">
+      <h3 class="font-semibold text-gray-800 mb-4">
+        <i class="bi bi-layout-sidebar"></i> Left panel
+      </h3>
+      <% template.ui_group(:left_panel).each do |field_key| %>
+        <%= render "landing/field_input",
+                   field_key: field_key, template: template, landing: landing %>
+      <% end %>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rounded-xl bg-white border border-gray-200 p-6 shadow-sm">
+      <h3 class="font-semibold text-gray-800 mb-4">
+        <i class="bi bi-columns"></i> Right panel
+      </h3>
+      <% template.ui_group(:right_panel).each do |field_key| %>
+        <%= render "landing/field_input",
+                   field_key: field_key, template: template, landing: landing %>
+      <% end %>
+
+      <div class="mt-4 text-right">
+        <button type="submit"
+                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2 font-medium shadow-sm">
+          <i class="bi bi-check2-circle"></i> Save changes
+        </button>
+      </div>
+    </div>
+  <% end %>
+</div>

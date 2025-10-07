@@ -25,6 +25,10 @@ class ProjectsController < ApplicationController
   def show
     @project = current_user.projects.find_by!(slug: params[:id])
     @landing = @project.active_landing
+
+    if turbo_frame_request? && params[:device].present?
+      render partial: "projects/preview_panel", locals: { device: @device, project: @project }
+    end
   end
 
   def edit
