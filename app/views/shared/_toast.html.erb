@@ -1,19 +1,46 @@
-<%# locals: message:, type: :success|:error|:info, duration: Integer(ms) %>
+<%# locals: title:, message:, type: :success|:error|:info, duration: Integer(ms) %>
 <%
   type  ||= :success
   dur     = (duration || 4000).to_i
-  bg_cls  = case type.to_sym
-            when :error then "bg-red-600"
-            when :info  then "bg-blue-600"
-            else             "bg-emerald-600"
-            end
+
+  color  = case type.to_sym
+           when :error then "red"
+           when :info  then "blue"
+           else             "emerald"
+           end
 %>
 
 <div data-controller="toast"
      data-toast-duration-value="<%= dur %>"
-     class="pointer-events-auto relative flex items-center justify-between w-80 rounded-lg shadow-lg overflow-hidden text-sm text-white px-4 py-3 <%= bg_cls %>">
-  <span class="font-medium"><%= message %></span>
-  <button class="ml-3 opacity-80 hover:opacity-100 transition" data-action="click->toast#close" aria-label="Close">✕</button>
+     class="pointer-events-auto relative flex items-start w-80 rounded-xl bg-white shadow-lg border border-gray-100 overflow-hidden animate-fade-in">
+
+  <!-- Left accent -->
+  <div class="w-1 bg-<%= color %>-500"></div>
+
+  <!-- Icon + content -->
+  <div class="flex-1 flex items-start gap-3 p-4">
+    <div class="mt-1 text-<%= color %>-500">
+      <% if type.to_sym == :error %>
+        <i class="bi bi-x-circle-fill text-lg"></i>
+      <% elsif type.to_sym == :info %>
+        <i class="bi bi-info-circle-fill text-lg"></i>
+      <% else %>
+        <i class="bi bi-check-circle-fill text-lg"></i>
+      <% end %>
+    </div>
+
+    <div class="flex-1">
+      <p class="font-semibold text-gray-900"><%= title.presence || type.to_s.capitalize %></p>
+      <p class="text-sm text-gray-600 leading-snug"><%= message %></p>
+    </div>
+
+    <button data-action="click->toast#close"
+            class="text-gray-400 hover:text-gray-600 transition text-sm">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Countdown bar -->
   <div data-toast-target="bar"
-       class="absolute bottom-0 left-0 h-0.5 bg-white/80 w-full"></div>
+       class="absolute bottom-0 left-0 h-0.5 bg-<%= color %>-500 w-full"></div>
 </div>

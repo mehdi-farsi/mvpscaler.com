@@ -2,17 +2,18 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = ["bar"]
-    static values  = { duration: Number }
+    static values = { duration: Number }
 
     connect() {
-        // start the countdown bar animation
         const dur = this.durationValue || 4000
-        // force a reflow so transition applies
+
+        // Animate countdown bar
         requestAnimationFrame(() => {
             this.barTarget.style.transition = `width ${dur}ms linear`
             this.barTarget.style.width = "0%"
         })
-        // schedule auto close
+
+        // Auto-dismiss after duration
         this.timeout = setTimeout(() => this.close(), dur)
     }
 
@@ -21,7 +22,7 @@ export default class extends Controller {
     }
 
     close() {
-        this.element.classList.add("opacity-0", "translate-x-3", "transition-all", "duration-200")
-        setTimeout(() => this.element.remove(), 180)
+        this.element.classList.add("opacity-0", "translate-x-3", "transition-all", "duration-300")
+        setTimeout(() => this.element.remove(), 250)
     }
 }
