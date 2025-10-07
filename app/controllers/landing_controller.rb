@@ -53,9 +53,11 @@ class LandingController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: [
-          turbo_stream.dispatch("notify", target: "notifications", event: "notify", payload: { message: "Landing updated!", type: "success" })
-        ]
+        render turbo_stream: turbo_stream.append(
+          "notifications",
+          partial: "shared/toast",
+          locals: { message: "Landing updated!", type: :success, duration: 4000 }
+        )
       end
       # format.turbo_stream { render turbo_stream: turbo_stream.replace("save_notice", partial: "landing/save_notice") }
       format.html { redirect_to edit_project_landing_path(@project), notice: "Settings updated." }

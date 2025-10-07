@@ -1,0 +1,19 @@
+<%# locals: message:, type: :success|:error|:info, duration: Integer(ms) %>
+<%
+  type  ||= :success
+  dur     = (duration || 4000).to_i
+  bg_cls  = case type.to_sym
+            when :error then "bg-red-600"
+            when :info  then "bg-blue-600"
+            else             "bg-emerald-600"
+            end
+%>
+
+<div data-controller="toast"
+     data-toast-duration-value="<%= dur %>"
+     class="pointer-events-auto relative flex items-center justify-between w-80 rounded-lg shadow-lg overflow-hidden text-sm text-white px-4 py-3 <%= bg_cls %>">
+  <span class="font-medium"><%= message %></span>
+  <button class="ml-3 opacity-80 hover:opacity-100 transition" data-action="click->toast#close" aria-label="Close">✕</button>
+  <div data-toast-target="bar"
+       class="absolute bottom-0 left-0 h-0.5 bg-white/80 w-full"></div>
+</div>
