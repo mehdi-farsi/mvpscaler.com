@@ -56,7 +56,12 @@ class LandingController < ApplicationController
         render turbo_stream: turbo_stream.append(
           "notifications",
           partial: "shared/toast",
-          locals: { message: "Landing updated!", type: :success, duration: 4000 }
+          locals: {
+            title:   "Success",
+            message: "Your changes are saved successfully.",
+            type:    :success,
+            duration: 4000
+          }
         )
       end
       # format.turbo_stream { render turbo_stream: turbo_stream.replace("save_notice", partial: "landing/save_notice") }

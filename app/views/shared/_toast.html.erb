@@ -1,17 +1,19 @@
-<%# locals: title:, message:, type: :success|:error|:info, duration: Integer(ms) %>
+<%# locals: title:, message:, type: :success|:error|:info, duration: ms %>
 <%
-  type  ||= :success
-  dur     = (duration || 4000).to_i
+  type     = (local_assigns[:type] || :success).to_sym
+  message  = local_assigns[:message].to_s
+  title    = (local_assigns[:title].presence || type.to_s.capitalize)
+  duration = (local_assigns[:duration] || 4000).to_i
 
-  color  = case type.to_sym
-           when :error then "red"
-           when :info  then "blue"
-           else             "emerald"
-           end
+  color = case type
+          when :error then "red"
+          when :info  then "blue"
+          else             "emerald"
+          end
 %>
 
 <div data-controller="toast"
-     data-toast-duration-value="<%= dur %>"
+     data-toast-duration-value="<%= duration %>"
      class="pointer-events-auto relative flex items-start w-80 rounded-xl bg-white shadow-lg border border-gray-100 overflow-hidden animate-fade-in">
 
   <!-- Left accent -->
@@ -20,9 +22,9 @@
   <!-- Icon + content -->
   <div class="flex-1 flex items-start gap-3 p-4">
     <div class="mt-1 text-<%= color %>-500">
-      <% if type.to_sym == :error %>
+      <% if type == :error %>
         <i class="bi bi-x-circle-fill text-lg"></i>
-      <% elsif type.to_sym == :info %>
+      <% elsif type == :info %>
         <i class="bi bi-info-circle-fill text-lg"></i>
       <% else %>
         <i class="bi bi-check-circle-fill text-lg"></i>
@@ -30,7 +32,7 @@
     </div>
 
     <div class="flex-1">
-      <p class="font-semibold text-gray-900"><%= title.presence || type.to_s.capitalize %></p>
+      <p class="font-semibold text-gray-900"><%= title %></p>
       <p class="text-sm text-gray-600 leading-snug"><%= message %></p>
     </div>
 
