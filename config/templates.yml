@@ -21,8 +21,6 @@ default:
           - copy.badge_3
           - general.left_bg
           - general.background_image
-          - general.background_image_avif
-          - general.background_image_webp
 
       - key: cta_card
         title: "CTA card"
@@ -51,16 +49,6 @@ default:
         label: "Background image (fallback)"
         choices: ["hero-bg.png"]
         default: "hero-bg.png"
-      general.background_image_avif:
-        type: image_asset
-        label: "Background image (AVIF)"
-        choices: ["hero-bg.avif"]
-        default: "hero-bg.avif"
-      general.background_image_webp:
-        type: image_asset
-        label: "Background image (WEBP)"
-        choices: ["hero-bg.webp"]
-        default: "hero-bg.webp"
 
       copy.headline:
         type: text
