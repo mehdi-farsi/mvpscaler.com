@@ -1,6 +1,4 @@
-class ProjectsController < ApplicationController
-  layout "dashboard"
-
+class ProjectsController < AppController
   def new
     unless current_user.can_create_project?
       redirect_to dashboard_path, alert: "Upgrade to create more projects."

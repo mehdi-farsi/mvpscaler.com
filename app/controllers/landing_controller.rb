@@ -1,5 +1,5 @@
 # app/controllers/landing_controller.rb
-class LandingController < ApplicationController
+class LandingController < AppController
   # Public page uses the landing layout and skips CSRF
   layout :landing_layout, only: :show
   skip_before_action :verify_authenticity_token, only: :show
@@ -73,8 +73,7 @@ class LandingController < ApplicationController
 
   # Layout only for the public show
   def landing_layout
-    return "landing" unless @landing&.template&.layout.present?
-    @landing.template.layout
+    @landing&.template&.layout.presence || "landing"
   end
 
   # Dashboard helpers
