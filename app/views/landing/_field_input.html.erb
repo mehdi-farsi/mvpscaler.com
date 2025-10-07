@@ -1,206 +1,134 @@
-<%# app/views/landing/_field_input.html.erb %>
-<%# locals: field_key (e.g. "copy.headline"), template:, landing: %>
+<%# locals: field_key, template:, landing: %>
 <%
   meta        = (template.fields[field_key] || {}).stringify_keys
-  label       = meta["label"].presence || field_key.split(".").last.humanize
   type        = meta["type"].to_s.presence || "text"
   rows        = (meta["rows"].presence || 3).to_i
   choices     = Array(meta["choices"])
   placeholder = meta["placeholder"]
-  hint_text   = meta["hint"]
-  min         = meta["min"]
-  max         = meta["max"]
-  step        = meta["step"]
 
-  # Current value from landing.settings; fallback to template default
   bucket, *rest = field_key.split(".")
   current = landing.settings.dig(bucket, *rest)
   current = LandingTemplate.defaults_for(landing.template_key).dig(bucket, *rest) if current.nil?
 
-  # Helper: shared classes
-  input_classes = "peer w-full rounded-xl border border-gray-200 bg-white/80 px-3.5 pt-5 pb-2 text-gray-900 placeholder-transparent shadow-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition"
-  select_classes = "rounded-xl border border-gray-300 bg-white/80 px-3 py-2 text-gray-900 shadow-sm hover:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 transition"
+  base_text = "w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-900 placeholder-gray-400
+               focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
+  base_sel  = "w-full rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-900
+               focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
 %>
 
-<div class="relative flex flex-col gap-1" data-landing-editor-field>
-  <%# ───────────────────────── TEXT / LONGTEXT / NUMBER / URL ───────────────────────── %>
-  <% if %w[text longtext number url].include?(type) %>
-    <div class="relative">
-      <% if type == "longtext" %>
-        <textarea
-          name="settings_flat[<%= field_key %>]"
-          rows="<%= rows %>"
-          placeholder="<%= placeholder %>"
-          class="<%= input_classes %>"><%= current.to_s %></textarea>
-      <% else %>
-        <input
-          type="<%= type == 'number' ? 'number' : (type == 'url' ? 'url' : 'text') %>"
-          name="settings_flat[<%= field_key %>]"
-          value="<%= current.to_s %>"
-          placeholder="<%= placeholder %>"
-          <%= %(min="#{min}") if min.present? %>
-          <%= %(max="#{max}") if max.present? %>
-          <%= %(step="#{step}") if step.present? %>
-          class="<%= input_classes %>" />
-      <% end %>
-
-      <label class="absolute left-3.5 top-2 text-gray-500 text-sm transition-all
-                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-placeholder-shown:font-normal
-                    peer-focus:top-2 peer-focus:text-sm peer-focus:text-emerald-600">
-        <%= label %>
-      </label>
-    </div>
-    <% if hint_text.present? %>
-      <p class="text-xs text-gray-500"><%= hint_text %></p>
-    <% end %>
-
-    <%# ───────────────────────── SELECT (explicit or inferred by choices) ───────────────────────── %>
-  <% elsif type == "select" || (choices.any? && type != "image_asset") %>
-    <div class="space-y-1">
-      <label class="block text-sm font-medium text-gray-700"><%= label %></label>
-      <select
-        name="settings_flat[<%= field_key %>]"
-        class="<%= select_classes %>">
-        <option value=""></option>
-        <% choices.each do |opt| %>
-          <% text, value = opt.is_a?(Array) ? opt : [opt, opt] %>
-          <option value="<%= value %>" <%= "selected" if current.to_s == value.to_s %>><%= text %></option>
-        <% end %>
-      </select>
-      <% if hint_text.present? %>
-        <p class="text-xs text-gray-500"><%= hint_text %></p>
-      <% end %>
-    </div>
-
-    <%# ───────────────────────── COLOR ───────────────────────── %>
-  <% elsif type == "color" %>
-    <div class="flex items-center gap-3">
-      <input
-        type="color"
-        value="<%= current.to_s.presence || '#ffffff' %>"
-        class="h-9 w-12 cursor-pointer rounded-lg border border-gray-200 shadow-sm hover:ring-2 hover:ring-emerald-300 transition"
-        oninput="this.nextElementSibling.querySelector('input').value=this.value; this.nextElementSibling.querySelector('input').dispatchEvent(new Event('input'))" />
-      <div class="relative flex-1">
-        <input
-          type="text"
-          name="settings_flat[<%= field_key %>]"
-          value="<%= current.to_s %>"
-          placeholder="<%= placeholder.presence || '#RRGGBB' %>"
-          class="<%= input_classes %>" />
-        <label class="absolute left-3.5 top-2 text-gray-500 text-sm transition-all
-                      peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
-                      peer-focus:top-2 peer-focus:text-sm peer-focus:text-emerald-600">
-          <%= label %>
-        </label>
-      </div>
-    </div>
-    <% if hint_text.present? %>
-      <p class="text-xs text-gray-500"><%= hint_text %></p>
-    <% end %>
-
-    <%# ───────────────────────── BOOLEAN / TOGGLE ───────────────────────── %>
-  <% elsif %w[boolean toggle].include?(type) %>
-    <label class="inline-flex items-center gap-3 cursor-pointer">
-      <% checked = ActiveModel::Type::Boolean.new.cast(current) %>
-      <input type="hidden" name="settings_flat[<%= field_key %>]" value="0" />
-      <input type="checkbox"
-             name="settings_flat[<%= field_key %>]"
-             value="1"
-             <%= "checked" if checked %>
-             class="peer sr-only" />
-      <span class="h-5 w-10 rounded-full bg-gray-300 ring-1 ring-inset ring-gray-200 relative transition
-                   after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition
-                   peer-checked:bg-emerald-600 peer-checked:after:translate-x-5"></span>
-      <span class="text-sm text-gray-800"><%= label %></span>
-    </label>
-    <% if hint_text.present? %>
-      <p class="text-xs text-gray-500"><%= hint_text %></p>
-    <% end %>
-
-    <%# ───────────────────────── IMAGE ASSET (preview + select/text + upload) ───────────────────────── %>
-  <% elsif type == "image_asset" %>
-    <% url_map = (choices.presence || []).index_with { |fn| image_path(fn) } rescue {} %>
-    <% preview_url = landing.asset_url_for(field_key).presence || "" %>
-
-    <div
-      data-controller="landing-editor"
-      data-landing-editor-url-map-value="<%= url_map.to_json %>"
-      class="flex flex-col gap-2">
-      <label class="text-sm font-medium text-gray-700"><%= label %></label>
-
-      <div class="relative flex items-center gap-4 p-3 rounded-xl border border-gray-200 bg-gray-50 hover:border-emerald-400 transition-all">
-        <div class="w-28 h-20 rounded-lg overflow-hidden bg-gray-100 shadow-inner border border-gray-200 shrink-0">
-          <img
-            data-landing-editor-target="imagePreview"
-            src="<%= preview_url %>"
-            alt="<%= current.presence || 'no image' %>"
-            class="w-full h-full object-cover transition-all hover:scale-105"
-            onerror="this.src=''; this.alt='no image'; this.classList.add('opacity-40')">
-        </div>
-
-        <div class="flex flex-col flex-1 gap-2">
-          <% if choices.any? %>
-            <select
-              name="settings_flat[<%= field_key %>]"
-              data-landing-editor-target="imageInput"
-              data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
-              class="<%= select_classes %>">
-              <option value=""></option>
-              <% choices.each do |fn| %>
-                <option value="<%= fn %>" <%= "selected" if current.to_s == fn %>><%= fn %></option>
-              <% end %>
-            </select>
-          <% else %>
-            <input
-              type="text"
-              name="settings_flat[<%= field_key %>]"
-              value="<%= current.to_s %>"
-              placeholder="<%= placeholder.presence || 'e.g. hero-bg.webp or URL' %>"
-              data-landing-editor-target="imageInput"
-              data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
-              class="<%= select_classes %>" />
-          <% end %>
-
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              data-action="landing-editor#pickFile"
-              class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all">
-              <i class="bi bi-upload"></i> Upload
-            </button>
-
-            <input
-              type="file"
-              accept="image/*"
-              name="uploads[<%= field_key %>]"
-              data-landing-editor-target="fileInput"
-              data-action="change->landing-editor#fileChosen"
-              class="hidden" />
-          </div>
-          <% if hint_text.present? %>
-            <p class="text-xs text-gray-500"><%= hint_text %></p>
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    <%# ───────────────────────── DEFAULT (fallback to text) ───────────────────────── %>
+<%# TEXT / LONGTEXT / NUMBER / URL %>
+<% if %w[text longtext number url].include?(type) %>
+  <% if type == "longtext" %>
+    <textarea name="settings_flat[<%= field_key %>]"
+              rows="<%= rows %>"
+              placeholder="<%= placeholder %>"
+              class="<%= base_text %> resize-y min-h-[84px]"><%= current.to_s %></textarea>
   <% else %>
-    <div class="relative">
-      <input
-        type="text"
-        name="settings_flat[<%= field_key %>]"
-        value="<%= current.to_s %>"
-        placeholder="<%= placeholder %>"
-        class="<%= input_classes %>" />
-      <label class="absolute left-3.5 top-2 text-gray-500 text-sm transition-all
-                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-placeholder-shown:font-normal
-                    peer-focus:top-2 peer-focus:text-sm peer-focus:text-emerald-600">
-        <%= label %>
-      </label>
-    </div>
-    <% if hint_text.present? %>
-      <p class="text-xs text-gray-500"><%= hint_text %></p>
-    <% end %>
+    <input type="<%= type == 'number' ? 'number' : (type == 'url' ? 'url' : 'text') %>"
+           name="settings_flat[<%= field_key %>]"
+           value="<%= current.to_s %>"
+           placeholder="<%= placeholder %>"
+           class="<%= base_text %>">
   <% end %>
-</div>
+
+<%# SELECT (explicit or inferred by choices) %>
+<% elsif type == "select" || (choices.any? && type != "image_asset") %>
+  <select name="settings_flat[<%= field_key %>]" class="<%= base_sel %>">
+    <option value=""></option>
+    <% choices.each do |opt| %>
+      <% text, value = opt.is_a?(Array) ? opt : [opt, opt] %>
+      <option value="<%= value %>" <%= "selected" if current.to_s == value.to_s %>><%= text %></option>
+    <% end %>
+  </select>
+
+<%# COLOR %>
+<% elsif type == "color" %>
+  <div class="flex items-center gap-2">
+    <input type="color"
+           value="<%= current.to_s.presence || '#ffffff' %>"
+           class="h-8 w-10 cursor-pointer rounded-md border border-gray-300"
+           oninput="this.nextElementSibling.value=this.value; this.nextElementSibling.dispatchEvent(new Event('input'))">
+    <input type="text"
+           name="settings_flat[<%= field_key %>]"
+           value="<%= current.to_s %>"
+           placeholder="<%= placeholder.presence || '#RRGGBB' %>"
+           class="<%= base_text %>">
+  </div>
+
+<%# BOOLEAN / TOGGLE %>
+<% elsif %w[boolean toggle].include?(type) %>
+  <% checked = ActiveModel::Type::Boolean.new.cast(current) %>
+  <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+    <input type="hidden" name="settings_flat[<%= field_key %>]" value="0">
+    <input type="checkbox"
+           name="settings_flat[<%= field_key %>]"
+           value="1"
+           <%= "checked" if checked %>
+           class="peer sr-only">
+    <span class="h-5 w-9 rounded-full bg-gray-300 ring-1 ring-inset ring-gray-200 relative transition
+                 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition
+                 peer-checked:bg-emerald-600 peer-checked:after:translate-x-4"></span>
+    <span class="text-sm text-gray-700">Enabled</span>
+  </label>
+
+<%# IMAGE ASSET (compact) %>
+<% elsif type == "image_asset" %>
+  <% url_map     = (choices.presence || []).index_with { |fn| image_path(fn) } rescue {} %>
+  <% preview_url = landing.asset_url_for(field_key).presence || "" %>
+
+  <div data-controller="landing-editor"
+       data-landing-editor-url-map-value="<%= url_map.to_json %>"
+       class="flex items-center gap-3">
+    <div class="h-[44px] w-[80px] rounded-md border border-gray-200 overflow-hidden bg-gray-50">
+      <img data-landing-editor-target="imagePreview"
+           src="<%= preview_url %>"
+           alt="<%= current.presence || 'no image' %>"
+           class="w-full h-full object-cover"
+           onerror="this.src=''; this.alt='no image'; this.classList.add('opacity-40')">
+    </div>
+
+    <div class="flex-1 grid grid-cols-2 gap-2">
+      <% if choices.any? %>
+        <select name="settings_flat[<%= field_key %>]"
+                data-landing-editor-target="imageInput"
+                data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
+                class="<%= base_sel %>">
+          <option value=""></option>
+          <% choices.each do |fn| %>
+            <option value="<%= fn %>" <%= "selected" if current.to_s == fn %>><%= fn %></option>
+          <% end %>
+        </select>
+      <% else %>
+        <input type="text"
+               name="settings_flat[<%= field_key %>]"
+               value="<%= current.to_s %>"
+               placeholder="<%= placeholder.presence || 'hero-bg.webp or URL' %>"
+               data-landing-editor-target="imageInput"
+               data-action="input->landing-editor#updateImage change->landing-editor#updateImage"
+               class="<%= base_text %>">
+      <% end %>
+
+      <div class="flex items-center justify-end">
+        <button type="button"
+                data-action="landing-editor#pickFile"
+                class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+          <i class="bi bi-upload"></i> Upload
+        </button>
+        <input type="file"
+               accept="image/*"
+               name="uploads[<%= field_key %>]"
+               data-landing-editor-target="fileInput"
+               data-action="change->landing-editor#fileChosen"
+               class="hidden">
+      </div>
+    </div>
+  </div>
+
+<%# DEFAULT → text %>
+<% else %>
+  <input type="text"
+         name="settings_flat[<%= field_key %>]"
+         value="<%= current.to_s %>"
+         placeholder="<%= placeholder %>"
+         class="<%= base_text %>">
+<% end %>

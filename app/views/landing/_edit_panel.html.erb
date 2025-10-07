@@ -1,7 +1,5 @@
-<%# app/views/landing/_edit_panel.html.erb %>
 <%# locals: project:, landing:, template: %>
-
-<div class="mt-6 space-y-6" data-controller="autosave-form">
+<div class="mt-4" data-controller="autosave-form">
   <div id="save_notice"></div>
 
   <%= form_with url: project_landing_path(project),
@@ -10,33 +8,50 @@
                 class: "space-y-10" do %>
 
     <% template.sections.each do |section| %>
-      <div class="rounded-2xl border border-gray-200 bg-white/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-          <h3 class="font-semibold text-gray-800 text-lg flex items-center gap-2">
-            <i class="bi bi-sliders text-emerald-600"></i>
-            <%= section[:title] %>
-          </h3>
-          <span class="text-xs text-gray-400 uppercase tracking-wider">Section</span>
-        </div>
+      <section>
+        <header class="flex items-end justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900"><%= section[:title] %></h3>
+            <% if section[:subtitle].present? %>
+              <p class="text-xs text-gray-500 mt-0.5"><%= section[:subtitle] %></p>
+            <% end %>
+          </div>
+        </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+        <!-- Settings list: label (min-w) + input -->
+        <div class="mt-4 divide-y divide-gray-200 border border-gray-200 rounded-xl bg-white/80">
           <% section[:field_keys].each do |field_key| %>
-            <%= render "landing/field_input",
-                       field_key: field_key,
-                       template:  template,
-                       landing:   landing %>
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 p-3 sm:p-3.5">
+              <div class="sm:col-span-2">
+                <% meta = (template.fields[field_key] || {}).stringify_keys %>
+                <div class="text-[13px] font-medium text-gray-700">
+                  <%= meta["label"].presence || field_key.split(".").last.humanize %>
+                </div>
+                <% if meta["hint"].present? %>
+                  <div class="text-xs text-gray-500 mt-0.5"><%= meta["hint"] %></div>
+                <% end %>
+              </div>
+
+              <div class="sm:col-span-3">
+                <%= render "landing/field_input",
+                           field_key: field_key,
+                           template:  template,
+                           landing:   landing %>
+              </div>
+            </div>
           <% end %>
         </div>
-      </div>
+      </section>
     <% end %>
 
-    <div class="flex items-center justify-end gap-4 pt-4">
-      <p class="text-sm text-gray-500">Your changes update the landing preview instantly.</p>
+    <div class="flex items-center justify-end gap-3">
       <button type="submit"
-              class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-5 py-2.5 font-medium shadow-sm hover:shadow transition-all">
-        <i class="bi bi-check2-circle text-lg"></i>
-        Save Changes
+              class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white
+                     hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+        <i class="bi bi-check2-circle"></i>
+        Save
       </button>
+      <span class="text-xs text-gray-500">Preview updates instantly.</span>
     </div>
   <% end %>
 </div>
