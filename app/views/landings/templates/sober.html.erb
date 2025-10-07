@@ -1,13 +1,18 @@
+<%# app/views/landings/templates/sober.html.erb %>
 <% s = @landing %>
+<% avif_url = @landing.asset_url_for("general.background_image_avif") %>
+<% webp_url = @landing.asset_url_for("general.background_image_webp") %>
+<% base_url = @landing.asset_url_for("general.background_image").presence || image_path("hero-bg.png") %>
+
 <section id="hero" class="relative isolate min-h-[100svh] md:h-[100svh] w-full overflow-visible md:overflow-hidden">
   <picture>
-    <% if s.s("general.background_image_avif").present? %>
-      <source srcset="<%= image_path(s.s("general.background_image_avif")) %>" type="image/avif">
+    <% if avif_url.present? %>
+      <source srcset="<%= avif_url %>" type="image/avif">
     <% end %>
-    <% if s.s("general.background_image_webp").present? %>
-      <source srcset="<%= image_path(s.s("general.background_image_webp")) %>" type="image/webp">
+    <% if webp_url.present? %>
+      <source srcset="<%= webp_url %>" type="image/webp">
     <% end %>
-    <img src="<%= image_path(s.s("general.background_image", "hero-bg.png")) %>" alt="" aria-hidden="true"
+    <img src="<%= base_url %>" alt="" aria-hidden="true"
          width="2400" height="1400" fetchpriority="high" decoding="async"
          class="absolute inset-0 -z-20 h-full w-full object-cover">
   </picture>
@@ -17,7 +22,9 @@
   <div class="relative z-10 h-auto md:h-full">
     <div class="grid grid-cols-1 md:[grid-template-columns:2fr_1fr] h-auto md:h-full">
 
-      <div class="flex flex-col justify-center px-6 md:pl-12 md:pr-8 py-12 md:py-0 text-center md:text-left" style="<%= s.s("general.left_bg") ? "background: #{s.s("general.left_bg")}" : "" %>">
+      <!-- LEFT (copy) -->
+      <div class="flex flex-col justify-center px-6 md:pl-12 md:pr-8 py-12 md:py-0 text-center md:text-left"
+           style="<%= s.s('general.left_bg').present? ? "background: #{s.s('general.left_bg')}" : '' %>">
         <h1 class="mt-0 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
           <span class="block"><%= s.s("copy.headline", "Your Guided Idea Validation Assistant") %></span>
           <span class="mt-3 block text-xl sm:text-2xl font-medium leading-snug text-gray-800 tracking-tight">
@@ -46,6 +53,7 @@
         </div>
       </div>
 
+      <!-- RIGHT (CTA card) -->
       <div class="w-full h-auto md:h-full flex flex-col justify-center px-6 md:px-10 py-12 relative"
            style="background:<%= s.s('colors.right_panel', '#111827') %>">
         <div class="mb-8 flex justify-center md:justify-start">
@@ -68,6 +76,7 @@
           <i class="bi bi-heart-fill text-emerald-500"></i>
         </div>
       </div>
+
     </div>
   </div>
 </section>
