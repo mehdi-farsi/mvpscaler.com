@@ -22,22 +22,31 @@ class LandingController < ApplicationController
   # Render the inline editor into a Turbo Frame on the project page
   def edit
     @template = LandingTemplate.find(@landing.template_key)
-    render partial: "landing/edit_panel", locals: { project: @project, landing: @landing, template: @template }
+
+    render partial: "landing/edit_frame"
+    # render partial: "landing/edit_panel", locals: { project: @project, landing: @landing, template: @template }
   end
 
   # Persist settings and respond via Turbo Stream (no full reload)
   def update
     @template = LandingTemplate.find(@landing.template_key)
-    incoming  = params.require(:settings).permit!
-    filtered  = whitelist_by_template(incoming.to_h, @template)
 
-    @landing.update!(settings: @landing.settings.deep_merge(filtered))
+    incoming = params.fetch(:settings_flat, {}).permit!.to_h
+    filtered = whitelist_by_template(incoming, @template)
+
+    # Merge into existing settings
+    new_settings = @landing.settings.deep_merge(filtered)
+
+    pp ?1*100, @landing.settings, ?1*100, filtered, ?1*100
+    @landing.update!(settings: new_settings)
 
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("save_notice", partial: "landing/save_notice")
+        render turbo_stream: turbo_stream.replace("save_notice",
+                                                  partial: "landing/save_notice")
       end
-      format.html { redirect_to edit_project_landing_path(@project), notice: "Settings updated." }
+      format.html { redirect_to edit_project_landing_path(@project),
+                                notice: "Settings updated." }
     end
   end
 
@@ -59,14 +68,26 @@ class LandingController < ApplicationController
   end
 
   # Only allow fields that exist in the YAML template
-  def whitelist_by_template(incoming, template)
-    allowed = Hash.new { |h, k| h[k] = {} }
-    template.fields.each_key do |full_key|
-      bucket, name = full_key.split(".", 2)
-      next unless incoming[bucket].is_a?(Hash)
-      next unless incoming[bucket].key?(name)
-      allowed[bucket][name] = incoming[bucket][name]
+  def whitelist_by_template(flat_hash, template, allow_clear: false)
+    out = Hash.new { |h, k| h[k] = {} }
+
+    flat_hash.each do |path, val|
+      bucket, *rest = path.to_s.split(".")
+      next if bucket.blank? || rest.empty?
+
+      key = rest.join(".") # support nested like general.background_image_webp
+
+      # Skip blank values unless you explicitly want to allow clearing
+      if !allow_clear
+        next if val.is_a?(String) && val.strip == ""
+      end
+
+      # Only accept fields that exist in this template
+      next unless template.supports?(bucket, key)
+
+      out[bucket][key] = (allow_clear && val == "__clear__") ? nil : val
     end
-    allowed
+
+    out
   end
 end
