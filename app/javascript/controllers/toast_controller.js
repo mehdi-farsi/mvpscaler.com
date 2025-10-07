@@ -2,27 +2,36 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = ["bar"]
-    static values = { duration: Number }
+    static values  = { duration: Number }
 
     connect() {
-        const dur = this.durationValue || 4000
+        // Animate the bottom bar from 100% to 0%
+        if (this.hasBarTarget) {
+            // force layout, then set transition + shrink
+            this.barTarget.style.width = "100%"
+            this.barTarget.style.transition = `width ${this.duration}ms linear`
+            requestAnimationFrame(() => { this.barTarget.style.width = "0%" })
+        }
 
-        // Animate countdown bar
+        // Fade-in (optional)
+        this.element.classList.add("opacity-0", "translate-y-2")
         requestAnimationFrame(() => {
-            this.barTarget.style.transition = `width ${dur}ms linear`
-            this.barTarget.style.width = "0%"
+            this.element.classList.add("transition", "duration-200")
+            this.element.classList.remove("opacity-0", "translate-y-2")
         })
 
-        // Auto-dismiss after duration
-        this.timeout = setTimeout(() => this.close(), dur)
+        // Auto close
+        this.timeout = setTimeout(() => this.close(), this.duration || 4000)
     }
 
     disconnect() {
-        clearTimeout(this.timeout)
+        if (this.timeout) clearTimeout(this.timeout)
     }
 
     close() {
-        this.element.classList.add("opacity-0", "translate-x-3", "transition-all", "duration-300")
-        setTimeout(() => this.element.remove(), 250)
+        // graceful fade-out then remove
+        this.element.classList.add("opacity-0", "translate-y-2")
+        this.element.classList.add("transition", "duration-200")
+        setTimeout(() => this.element.remove(), 220)
     }
 }
