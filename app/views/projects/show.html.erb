@@ -1,60 +1,136 @@
 <%# app/views/projects/show.html.erb %>
-<% device = params[:device].presence_in(%w[desktop mobile]) || "desktop" %>
+<%# Active landing/template %>
+<% landing  = @project.active_landing %>
+<% template = landing&.template || LandingTemplate.find(landing&.template_key) %>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <div class="lg:col-span-2 space-y-6">
-    <!-- Overview + Tabs + Frame -->
-    <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <h2 class="font-semibold text-gray-900 mb-3">
-        <i class="bi bi-graph-up-arrow text-gray-500 me-2"></i> Overview
-      </h2>
+<% active_tab = params[:tab].presence || "preview" %>
 
+<!-- Project subnav (full-width under top navbar) -->
+<div id="project-subnav" class="sticky top-[56px] z-30 bg-white/90 backdrop-blur border-b border-gray-200">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex items-center justify-between h-12">
+      <div class="flex items-center gap-2 text-sm">
+        <%= link_to "MVPScaler", dashboard_path, class: "text-gray-500 hover:text-gray-700" %>
+        <span class="text-gray-300">›</span>
+        <%= link_to "Projects", projects_path, class: "text-gray-500 hover:text-gray-700" %>
+        <span class="text-gray-300">›</span>
+        <span class="text-gray-900 font-medium"><%= @project.name %></span>
+      </div>
+
+      <nav class="flex items-center gap-2 text-sm">
+        <%= link_to "Preview",
+                    project_path(@project, tab: "preview"),
+                    class: "px-3 py-1.5 rounded-lg #{active_tab=='preview' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+        <%= link_to "Overview",
+                    project_path(@project, tab: "overview"),
+                    class: "px-3 py-1.5 rounded-lg #{active_tab=='overview' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+        <%= link_to "Leads",
+                    project_path(@project, tab: "leads"),
+                    class: "px-3 py-1.5 rounded-lg #{active_tab=='leads' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'}" %>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<% if active_tab == "preview" %>
+  <!-- Preview: sidebar editor + live preview -->
+  <div class="max-w-[1400px] mx-auto px-4">
+    <div class="flex gap-4"
+         data-controller="preview">
+
+      <!-- LEFT: Editor sidebar -->
+      <aside class="w-[360px] shrink-0">
+        <div class="sticky top-[calc(56px+48px)]" style="height: var(--preview-height);">
+          <div class="h-full overflow-y-auto rounded-xl border border-gray-200 bg-white">
+            <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-gray-900">Template editor</h3>
+              <span class="text-xs text-gray-500"><%= template&.name %></span>
+            </div>
+
+            <div class="p-4">
+              <%# Reuse your existing editor panel %>
+              <%= render "landing/edit_panel",
+                         project:  @project,
+                         landing:  landing,
+                         template: template %>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Preview area -->
+      <section class="flex-1 min-w-0 flex flex-col">
+
+        <!-- Controls row (top-right inside preview area, not overlaying the iframe) -->
+        <div class="flex items-center justify-end gap-2 mb-3">
+          <button type="button"
+                  data-preview-target="desktopBtn"
+                  data-action="click->preview#toDesktop"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-gray-300 text-gray-700 hover:bg-gray-100">
+            <i class="bi bi-display"></i> Desktop
+          </button>
+          <button type="button"
+                  data-preview-target="mobileBtn"
+                  data-action="click->preview#toMobile"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-gray-300 text-gray-700 hover:bg-gray-100">
+            <i class="bi bi-phone"></i> Mobile
+          </button>
+
+          <%= link_to landing_show_path(@project.slug),
+                      target: "_blank", rel: "noopener",
+                      class: "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-gray-300 text-gray-700 hover:bg-gray-100" do %>
+            <i class="bi bi-box-arrow-up-right"></i> Open public
+          <% end %>
+        </div>
+
+        <!-- DESKTOP WRAP -->
+        <div data-preview-target="desktopWrap" class="flex-1 overflow-hidden rounded-none border-0">
+          <iframe
+            src="<%= landing_show_path(@project.slug) %>"
+            class="w-full h-full"
+            style="height: var(--preview-height);"
+          ></iframe>
+        </div>
+
+        <!-- MOBILE WRAP -->
+        <div data-preview-target="mobileWrap" class="hidden flex-1">
+          <div class="w-full h-full bg-gray-900 rounded-xl flex items-center justify-center"
+               style="height: var(--preview-height);">
+            <div class="border border-gray-700 rounded-[2rem] p-4 shadow-2xl">
+              <iframe
+                src="<%= landing_show_path(@project.slug) %>"
+                class="rounded-[1.5rem] overflow-hidden"
+                style="width: 393px; height: 760px;"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+<% elsif active_tab == "overview" %>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="rounded-xl bg-white border border-gray-200 p-5">
+      <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-graph-up-arrow text-gray-500 me-2"></i> Overview</h2>
       <p class="text-sm text-gray-600">
         Public page:
         <%= link_to @project.public_url, @project.public_url, class: "text-emerald-700 hover:underline", target: "_blank", rel: "noopener" %>
       </p>
-
-      <!-- Tabs -->
-      <div class="mt-4 flex flex-wrap gap-2 items-center">
-        <%= link_to "Edit",
-                    edit_project_landing_path(@project),
-                    data: { turbo_frame: "project_panel" },
-                    class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm" %>
-
-        <%= link_to "Desktop",
-                    project_path(@project, device: :desktop),
-                    data: { turbo_frame: "project_panel" },
-                    class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if device=='desktop'}" %>
-
-        <%= link_to "Mobile",
-                    project_path(@project, device: :mobile),
-                    data: { turbo_frame: "project_panel" },
-                    class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm #{'bg-gray-100' if device=='mobile'}" %>
+      <div class="mt-6 text-sm text-gray-500">
+        Coming soon.
       </div>
-
-      <!-- Frame -->
-      <%= turbo_frame_tag :project_panel do %>
-        <%# Default content: same as Desktop %>
-        <div class="mt-4 rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-          <iframe src="<%= landing_show_path(@project.slug) %>" class="w-full h-[70vh]"></iframe>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- Your idea -->
-    <div class="rounded-xl bg-white border border-gray-200 p-5 shadow-sm">
-      <h2 class="font-semibold text-gray-900 mb-3">
-        <i class="bi bi-lightbulb text-gray-500 me-2"></i> Your idea
-      </h2>
-      <% if @project.briefs.any? %>
-        <% @project.briefs.order(created_at: :desc).each do |b| %>
-          <div class="border border-gray-200 rounded-lg p-4 mb-3">
-            <div class="text-sm text-gray-600">Audience: <%= b.audience %></div>
-            <div class="text-xs text-gray-500">Problem: <%= b.problem %></div>
-            <div class="text-xs text-gray-500">Your solution: <%= b.product_idea %></div>
-          </div>
-        <% end %>
-      <% end %>
     </div>
   </div>
-</div>
+
+<% else %> <%# leads %>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="rounded-xl bg-white border border-gray-200 p-5">
+      <h2 class="font-semibold text-gray-900 mb-3"><i class="bi bi-people text-gray-500 me-2"></i> Leads</h2>
+      <div class="mt-6 text-sm text-gray-500">
+        Coming soon.
+      </div>
+    </div>
+  </div>
+<% end %>
