@@ -59,48 +59,58 @@
         </div>
       </aside>
 
-      <!-- RIGHT: Preview area -->
-      <section class="flex-1 min-w-0 flex flex-col">
-        <div class="flex items-center justify-end gap-2 mb-3">
-          <button type="button"
-                  data-preview-target="desktopBtn"
-                  data-action="click->preview#toDesktop"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 hover:bg-gray-100">
-            <i class="bi bi-display"></i> Desktop
-          </button>
-          <button type="button"
-                  data-preview-target="mobileBtn"
-                  data-action="click->preview#toMobile"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 hover:bg-gray-100">
-            <i class="bi bi-phone"></i> Mobile
-          </button>
+      <!-- RIGHT: Preview area (overlay controls) -->
+      <section class="flex-1 min-w-0">
+        <div class="relative w-full" style="height: var(--preview-height);">
+          <!-- Overlay controls (top-right) -->
+          <!-- Overlay controls (top-right) -->
+          <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+            <button
+              type="button"
+              data-preview-target="desktopBtn"
+              data-action="click->preview#toDesktop"
+              class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200"
+              title="Desktop preview">
+              <i class="bi bi-display text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
+              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Desktop</span>
+            </button>
 
-          <%= link_to landing_show_path(@project.slug),
-                      target: "_blank", rel: "noopener",
-                      class: "inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 text-gray-700 hover:bg-gray-100" do %>
-            <i class="bi bi-box-arrow-up-right"></i> Open public
-          <% end %>
-        </div>
+            <button
+              type="button"
+              data-preview-target="mobileBtn"
+              data-action="click->preview#toMobile"
+              class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200"
+              title="Mobile preview">
+              <i class="bi bi-phone text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
+              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Mobile</span>
+            </button>
 
-        <!-- DESKTOP -->
-        <div data-preview-target="desktopWrap" class="flex-1 overflow-hidden border-0">
-          <iframe src="<%= landing_show_path(@project.slug) %>"
-                  class="w-full h-full"
-                  style="height: var(--preview-height);"></iframe>
-        </div>
+            <%= link_to landing_show_path(@project.slug),
+                        target: "_blank", rel: "noopener",
+                        title: "Open public landing",
+                        class: "group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200" do %>
+              <i class="bi bi-box-arrow-up-right text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
+              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
+            <% end %>
+          </div>
 
-        <!-- MOBILE -->
-        <div data-preview-target="mobileWrap" class="hidden flex-1">
-          <div class="w-full h-full bg-gray-900 flex items-center justify-center"
-               style="height: var(--preview-height);">
-            <div class="border border-gray-700 p-4 shadow-2xl">
-              <iframe src="<%= landing_show_path(@project.slug) %>"
-                      class="overflow-hidden"
-                      style="width: 393px; height: 760px;"></iframe>
+          <!-- DESKTOP -->
+          <div data-preview-target="desktopWrap" class="absolute inset-0 overflow-hidden">
+            <iframe src="<%= landing_show_path(@project.slug) %>"
+                    class="w-full h-full"></iframe>
+          </div>
+
+          <!-- MOBILE -->
+          <div data-preview-target="mobileWrap" class="hidden absolute inset-0">
+            <div class="w-full h-full bg-gray-900 flex items-center justify-center">
+              <div class="border border-gray-700 p-4 shadow-2xl">
+                <iframe src="<%= landing_show_path(@project.slug) %>"
+                        class="overflow-hidden"
+                        style="width: 393px; height: 760px;"></iframe>
+              </div>
             </div>
           </div>
         </div>
-
       </section>
     </div>
   </div>
