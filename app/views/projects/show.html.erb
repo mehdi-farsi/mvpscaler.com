@@ -105,9 +105,16 @@
           <div data-preview-target="mobileWrap" class="hidden absolute inset-0">
             <div class="w-full h-full bg-gray-900 flex items-center justify-center">
               <div class="border border-gray-700 p-4 shadow-2xl">
-                <iframe src="<%= landing_show_path(@project.slug) %>"
-                        class="overflow-hidden"
-                        style="width: 393px; height: 760px;"></iframe>
+                <iframe
+                  src="<%= landing_show_path(@project.slug) %>"
+                  class="overflow-hidden"
+                  style="
+                  /* iPhone-like width */
+                    width: 393px;
+                    /* height never exceeds preview area */
+                    height: min(760px, calc(var(--preview-height) - 80px));
+                  "
+                ></iframe>
               </div>
             </div>
           </div>
