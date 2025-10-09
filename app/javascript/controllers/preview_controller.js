@@ -1,47 +1,35 @@
+// app/javascript/controllers/preview_controller.js
 import { Controller } from "@hotwired/stimulus"
 
-// Controls desktop/mobile toggle and keeps the iframe areas sized to the viewport
 export default class extends Controller {
     static targets = ["desktopWrap", "mobileWrap", "desktopBtn", "mobileBtn"]
-    static values  = { headerOffset: Number }
 
     connect() {
-        this.layout()
-        window.addEventListener("resize", this.layout)
-    }
-
-    disconnect() {
-        window.removeEventListener("resize", this.layout)
-    }
-
-    layout = () => {
-        // Calculate available height (viewport minus fixed chrome)
-        const header = document.querySelector("header.sticky")
-        const headerH = header ? header.offsetHeight : 0
-        const subnav  = document.getElementById("project-subnav")
-        const subnavH = subnav ? subnav.offsetHeight : 0
-
-        const availableH = window.innerHeight - headerH - subnavH
-        this.element.style.setProperty("--preview-height", `${availableH}px`)
-
-        // Ensure both wrappers get the same height (only one is visible)
-        if (this.hasDesktopWrapTarget) this.desktopWrapTarget.style.height = `${availableH}px`
-        if (this.hasMobileWrapTarget)  this.mobileWrapTarget.style.height  = `${availableH}px`
+        // Start in desktop mode, set colors
+        this.toDesktop()
     }
 
     toDesktop() {
         this.desktopWrapTarget.classList.remove("hidden")
         this.mobileWrapTarget.classList.add("hidden")
-        this.desktopBtnTarget.classList.add("bg-gray-900", "text-white")
-        this.mobileBtnTarget.classList.remove("bg-gray-900", "text-white")
-        this.layout()
+        this.setActive(this.desktopBtnTarget, true)
+        this.setActive(this.mobileBtnTarget, false)
     }
 
     toMobile() {
-        this.mobileWrapTarget.classList.remove("hidden")
         this.desktopWrapTarget.classList.add("hidden")
-        this.mobileBtnTarget.classList.add("bg-gray-900", "text-white")
-        this.desktopBtnTarget.classList.remove("bg-gray-900", "text-white")
-        this.layout()
+        this.mobileWrapTarget.classList.remove("hidden")
+        this.setActive(this.desktopBtnTarget, false)
+        this.setActive(this.mobileBtnTarget, true)
+    }
+
+    setActive(element, isActive) {
+        element.setAttribute("aria-pressed", isActive ? "true" : "false")
+
+        // Add green color for active, neutral for inactive
+        element.classList.toggle("text-emerald-500", isActive)
+        element.classList.toggle("hover:text-emerald-400", isActive)
+        element.classList.toggle("text-gray-500", !isActive)
+        element.classList.toggle("hover:text-gray-300", !isActive)
     }
 }
