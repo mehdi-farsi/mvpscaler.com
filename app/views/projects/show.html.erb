@@ -104,17 +104,22 @@
           <!-- MOBILE -->
           <div data-preview-target="mobileWrap" class="hidden absolute inset-0">
             <div class="w-full h-full bg-gray-900 flex items-center justify-center">
-              <div class="border border-gray-700 p-4 shadow-2xl">
-                <iframe
-                  src="<%= landing_show_path(@project.slug) %>"
-                  class="overflow-hidden"
-                  style="
-                  /* iPhone-like width */
+              <!-- Outer phone shell -->
+              <div class="relative border border-gray-700 bg-black/40 backdrop-blur-sm shadow-2xl rounded-[2rem] p-3 flex items-center justify-center">
+                <!-- Power button mock (optional aesthetic touch) -->
+                <div class="absolute top-1/2 -left-1 w-[2px] h-12 bg-gray-700 rounded-full opacity-60"></div>
+
+                <!-- Inner screen -->
+                <div class="overflow-hidden rounded-[1.5rem] bg-white shadow-inner border border-gray-800">
+                  <iframe
+                    src="<%= landing_show_path(@project.slug) %>"
+                    class="overflow-hidden rounded-[1.5rem]"
+                    style="
                     width: 393px;
-                    /* height never exceeds preview area */
-                    height: min(760px, calc(var(--preview-height) - 80px));
-                  "
-                ></iframe>
+                      height: min(760px, calc(var(--preview-height) - 80px));
+                    "
+                  ></iframe>
+                </div>
               </div>
             </div>
           </div>
