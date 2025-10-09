@@ -62,35 +62,41 @@
       <!-- RIGHT: Preview area (overlay controls) -->
       <section class="flex-1 min-w-0">
         <div class="relative w-full" style="height: var(--preview-height);">
-          <!-- Overlay controls (top-right) -->
-          <!-- Overlay controls (top-right) -->
-          <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <!-- Overlay controls (top-right, minimal tab strip) -->
+          <div class="absolute top-3 right-3 z-20 flex items-center gap-3 pointer-events-auto select-none">
             <button
               type="button"
               data-preview-target="desktopBtn"
               data-action="click->preview#toDesktop"
-              class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200"
-              title="Desktop preview">
-              <i class="bi bi-display text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
-              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Desktop</span>
+              aria-pressed="true"
+              class="px-3 py-1.5 text-xs font-semibold tracking-wide
+           border-b-2 border-emerald-600 text-emerald-700
+           hover:text-emerald-700 transition">
+              <i class="bi bi-display mr-1"></i>
+              Desktop
             </button>
 
             <button
               type="button"
               data-preview-target="mobileBtn"
               data-action="click->preview#toMobile"
-              class="group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200"
-              title="Mobile preview">
-              <i class="bi bi-phone text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
-              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Mobile</span>
+              aria-pressed="false"
+              class="px-3 py-1.5 text-xs font-semibold tracking-wide
+           border-b-2 border-transparent text-gray-700
+           hover:border-gray-300 hover:text-gray-900 transition">
+              <i class="bi bi-phone mr-1"></i>
+              Mobile
             </button>
+
+            <span class="text-gray-300">|</span>
 
             <%= link_to landing_show_path(@project.slug),
                         target: "_blank", rel: "noopener",
-                        title: "Open public landing",
-                        class: "group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/70 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md transition-all duration-200" do %>
-              <i class="bi bi-box-arrow-up-right text-gray-600 group-hover:text-emerald-600 text-lg transition-colors"></i>
-              <span class="absolute -bottom-7 text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
+                        class: "px-3 py-1.5 text-xs font-semibold tracking-wide
+                      border-b-2 border-transparent text-gray-700
+                      hover:border-gray-300 hover:text-gray-900 transition" do %>
+              <i class="bi bi-box-arrow-up-right mr-1"></i>
+              Open
             <% end %>
           </div>
 
