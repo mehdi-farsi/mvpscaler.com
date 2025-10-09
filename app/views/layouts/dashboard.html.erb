@@ -2,7 +2,6 @@
 <html>
 <head>
   <meta charset="utf-8">
-
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -13,7 +12,6 @@
 
   <%= yield :head %>
 
-  <%# Enable PWA manifest when ready %>
   <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
   <%= favicon_link_tag "favicon-32x32.png", rel: "icon", type: "image/png", sizes: "32x32" %>
@@ -29,10 +27,12 @@
   <%= render "layout/analytics" %>
 </head>
 
+<% full_bleed = content_for?(:full_bleed) %>
+
 <body class="bg-[#fafafa] text-gray-900">
 <!-- Top bar -->
 <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur h-14">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+  <div class="<%= full_bleed ? 'w-full px-4' : 'max-w-6xl mx-auto px-4' %> py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <%= link_to root_path, class: "flex items-center gap-2" do %>
         <%= image_tag("logo-mvpscaler-mark.svg", alt: "MVPScaler", class: "h-6 w-6") %>
@@ -45,7 +45,6 @@
       <%= link_to "New project", new_project_path,
                   class: "inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1.5 hover:bg-gray-50" %>
 
-      <%# Account dropdown placeholder (optional) %>
       <div class="hidden md:block text-gray-500">
         <%= link_to edit_user_registration_path, class: "hover:text-gray-700" do %>
           <i class="bi bi-person-circle"></i>
@@ -60,22 +59,8 @@
 <%= render "dashboard/sidebar" %>
 <%= render "shared/notifications" %>
 
-<!-- Flash messages -->
-<div class="max-w-6xl mx-auto px-4 mt-4 space-y-2">
-  <% if notice.present? %>
-    <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 text-sm">
-      <i class="bi bi-check2-circle mr-2"></i><%= notice %>
-    </div>
-  <% end %>
-  <% if alert.present? %>
-    <div class="rounded-lg bg-red-50 border border-red-200 text-red-900 px-4 py-3 text-sm">
-      <i class="bi bi-exclamation-triangle mr-2"></i><%= alert %>
-    </div>
-  <% end %>
-</div>
-
 <!-- Main content -->
-<main class="max-w-6xl mx-auto px-4 py-8">
+<main class="<%= full_bleed ? 'w-full px-0 lg:pl-[var(--sidebar-width,56px)]' : 'max-w-6xl mx-auto px-4' %> <%= content_for?(:no_main_padding) ? '' : 'py-8' %>">
   <%= yield %>
 </main>
 </body>
