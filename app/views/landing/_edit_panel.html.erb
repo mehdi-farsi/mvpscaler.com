@@ -1,5 +1,5 @@
 <%# locals: project:, landing:, template: %>
-<div class="mt-4" data-controller="autosave-form">
+<div class="mt-2" data-controller="autosave-form">
   <div id="save_notice"></div>
 
   <%= form_with url: project_landing_path(project),
@@ -8,30 +8,33 @@
                 class: "space-y-10" do %>
 
     <% template.sections.each do |section| %>
-      <section>
-        <header class="flex items-end justify-between">
+      <section class="select-none">
+        <!-- Section header (subtle, no box) -->
+        <header class="flex items-baseline justify-between px-1">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900"><%= section[:title] %></h3>
+            <h3 class="text-[12px] font-semibold text-gray-900 tracking-wide uppercase"><%= section[:title] %></h3>
             <% if section[:subtitle].present? %>
-              <p class="text-xs text-gray-500 mt-0.5"><%= section[:subtitle] %></p>
+              <p class="text-[11px] text-gray-500 mt-0.5"><%= section[:subtitle] %></p>
             <% end %>
           </div>
         </header>
 
-        <!-- Settings list: label (min-w) + input -->
-        <div class="mt-4 divide-y divide-gray-200 border border-gray-200 rounded-xl bg-white/80">
+        <!-- Rows: label + control; flat, only dividers -->
+        <div class="mt-2 divide-y divide-gray-200/80 border-t border-b border-gray-200/80 bg-white/70 backdrop-blur-sm">
           <% section[:field_keys].each do |field_key| %>
-            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 p-3 sm:p-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-5 items-center gap-3 px-2 sm:px-3 py-2.5 hover:bg-white/80 transition">
+              <!-- Label & hint -->
               <div class="sm:col-span-2">
                 <% meta = (template.fields[field_key] || {}).stringify_keys %>
-                <div class="text-[13px] font-medium text-gray-700">
+                <div class="text-[13px] font-medium text-gray-800 leading-tight">
                   <%= meta["label"].presence || field_key.split(".").last.humanize %>
                 </div>
                 <% if meta["hint"].present? %>
-                  <div class="text-xs text-gray-500 mt-0.5"><%= meta["hint"] %></div>
+                  <div class="text-[11px] text-gray-500 mt-0.5 leading-snug"><%= meta["hint"] %></div>
                 <% end %>
               </div>
 
+              <!-- Control -->
               <div class="sm:col-span-3">
                 <%= render "landing/field_input",
                            field_key: field_key,
@@ -44,14 +47,15 @@
       </section>
     <% end %>
 
-    <div class="flex items-center justify-end gap-3">
+    <!-- Footer actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
       <button type="submit"
-              class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white
-                     hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
-        <i class="bi bi-check2-circle"></i>
+              class="inline-flex items-center gap-2 h-9 rounded-md bg-emerald-600 px-3.5 text-[13px] font-semibold text-white
+                     hover:bg-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+        <i class="bi bi-check2-circle text-base"></i>
         Save
       </button>
-      <span class="text-xs text-gray-500">Preview updates instantly.</span>
+      <span class="text-[11px] text-gray-500">Preview updates instantly.</span>
     </div>
   <% end %>
 </div>
