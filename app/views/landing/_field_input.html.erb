@@ -1,5 +1,6 @@
 <%# app/views/landing/_field_input.html.erb %>
 <%# locals: field_key (e.g. "copy.headline"), template:, landing: %>
+
 <%
   meta        = (template.fields[field_key] || {}).stringify_keys
   label       = meta["label"].presence || field_key.split(".").last.humanize
